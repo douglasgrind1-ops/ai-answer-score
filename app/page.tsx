@@ -109,6 +109,40 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 text-slate-900 md:p-8">
       <div className="mx-auto max-w-6xl space-y-10">
+        <div className="sticky top-4 z-30">
+          <nav className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-sm backdrop-blur">
+            <div className="flex items-center gap-3">
+              <img
+                src="/assets/logo/ai-answer-score-mark.svg"
+                alt="AI Answer Score"
+                className="h-9 w-9"
+              />
+              <span className="text-sm font-semibold text-slate-900 md:text-base">
+                AI Answer Score
+              </span>
+            </div>
+
+            <div className="hidden items-center gap-6 text-sm text-slate-600 md:flex">
+              <a href="#how-it-works" className="hover:text-slate-900">
+                How it works
+              </a>
+              <a href="#leaderboard" className="hover:text-slate-900">
+                Model snapshot
+              </a>
+              <a href="#live-demo" className="hover:text-slate-900">
+                Live demo
+              </a>
+            </div>
+
+            <a
+              href="#live-demo"
+              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
+            >
+              Try demo
+            </a>
+          </nav>
+        </div>
+
         <header className="space-y-8">
           <div className="inline-flex items-center rounded-full border border-blue-300 bg-white/80 px-4 py-1.5 text-sm text-blue-700 shadow-sm backdrop-blur">
             AI answer evaluation
@@ -127,16 +161,37 @@ export default function Home() {
                   A trust score for AI-generated answers
                 </h1>
 
+                <p className="text-lg font-medium text-indigo-600">
+                  ChatGPT vs Claude vs Gemini — which answer should you trust?
+                </p>
+
                 <p className="max-w-3xl text-xl leading-relaxed text-slate-600">
-                  Score answer reliability, inspect the reasoning behind the
-                  score, and compare answers across AI models before you rely on
-                  them.
+                  Evaluate how reliable AI responses are, inspect the reasoning
+                  behind them, and compare answers across models before you trust
+                  the output.
                 </p>
 
                 <p className="max-w-2xl text-sm text-slate-500">
-                  Built for founders, analysts, researchers, writers, and anyone
-                  making decisions with AI-generated output.
+                  Analyze responses from ChatGPT, Claude, Gemini, Perplexity,
+                  and other AI systems to see which answer is strongest — and
+                  why.
                 </p>
+
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500">
+                  <span className="text-slate-400">Works with</span>
+                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
+                    ChatGPT
+                  </span>
+                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
+                    Claude
+                  </span>
+                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
+                    Gemini
+                  </span>
+                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
+                    Perplexity
+                  </span>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3">
@@ -153,6 +208,16 @@ export default function Home() {
                 >
                   See how it works
                 </a>
+              </div>
+
+              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-sm backdrop-blur w-fit">
+                <div className="text-3xl font-bold text-indigo-600">7.2</div>
+                <div className="text-sm text-slate-600">
+                  <div className="font-semibold text-slate-900">
+                    AI Answer Score
+                  </div>
+                  Moderately reliable
+                </div>
               </div>
 
               <div className="pt-1">
@@ -224,24 +289,24 @@ export default function Home() {
         <section className="space-y-5">
           <SectionIntro
             eyebrow="Why it matters"
-            title="Evaluate reliability before you trust the output"
-            description="AI Answer Score helps you see whether an answer is solid, context-dependent, or missing key reasoning before it influences a decision."
+            title="Not all AI answers are equally reliable"
+            description="Different AI models often produce very different answers to the same question. AI Answer Score helps you evaluate which responses are trustworthy — and where reasoning may break down."
           />
 
           <div className="grid gap-4 md:grid-cols-3">
             <FeatureCard
               title="Score answer reliability"
-              description="Quickly see whether an AI answer is strong, weak, or highly context-dependent."
+              description="Instantly see whether an AI response is strong, weak, or highly context-dependent."
               className="border-blue-200 bg-blue-100/70"
             />
             <FeatureCard
               title="Inspect the reasoning"
-              description="Uncover assumptions, blind spots, risks, and failure modes behind the answer."
+              description="Reveal hidden assumptions, missing risks, and logical gaps in the model’s reasoning."
               className="border-indigo-200 bg-indigo-100/70"
             />
             <FeatureCard
-              title="See which AI answered best"
-              description="Compare answers across AI models and understand why one response scored higher."
+              title="Compare AI models"
+              description="See which model answered best when multiple AIs respond to the same question."
               className="border-cyan-200 bg-cyan-100/70"
             />
           </div>
@@ -250,25 +315,67 @@ export default function Home() {
         <section id="how-it-works" className="space-y-5">
           <SectionIntro
             eyebrow="How it works"
-            title="From pasted answer to reasoning audit"
-            description="Drop in a question and one or two AI answers. Get a trust score, a concise verdict, and a deeper reasoning breakdown."
+            title="From AI answers to a trust score"
+            description="Paste a question and answers from one or more AI models. AI Answer Score evaluates reliability, highlights reasoning gaps, and shows which model performs best."
           />
 
           <div className="grid gap-4 md:grid-cols-3">
             <StepCard
               step="01"
-              title="Paste the question and answer"
-              description="Use any answer from ChatGPT, Claude, Gemini, or another AI model."
+              title="Paste the question and AI answer"
+              description="Use responses from ChatGPT, Claude, Gemini, or any other AI model."
             />
             <StepCard
               step="02"
-              title="Get an instant score"
-              description="See a reliability score plus a summary of what the answer gets right or wrong."
+              title="Get an instant trust score"
+              description="AI Answer Score analyzes the reasoning and assigns a reliability score."
             />
             <StepCard
               step="03"
-              title="Compare across models"
-              description="See which AI answered best and inspect assumptions, missing risks, and reasoning gaps."
+              title="Compare across AI models"
+              description="See which model produced the strongest answer and understand why it scored higher."
+            />
+          </div>
+        </section>
+
+        <section
+          id="leaderboard"
+          className="space-y-5 rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-sm backdrop-blur md:p-7"
+        >
+          <SectionIntro
+            eyebrow="Model snapshot"
+            title="How leading AI models compare"
+            description="Use AI Answer Score to evaluate responses side by side and understand which model is strongest for a specific question."
+          />
+
+          <div className="grid gap-4 md:grid-cols-4">
+            <LeaderboardCard
+              rank="01"
+              model="Claude"
+              score="8.4"
+              note="Strong reasoning, fewer unsupported jumps."
+              accent="border-green-200 bg-green-50"
+            />
+            <LeaderboardCard
+              rank="02"
+              model="ChatGPT"
+              score="7.8"
+              note="Useful answer, but some conclusions need more support."
+              accent="border-blue-200 bg-blue-50"
+            />
+            <LeaderboardCard
+              rank="03"
+              model="Gemini"
+              score="6.9"
+              note="Helpful overall, but weaker nuance in edge cases."
+              accent="border-amber-200 bg-amber-50"
+            />
+            <LeaderboardCard
+              rank="04"
+              model="Perplexity"
+              score="6.4"
+              note="Good synthesis, but sometimes more context-dependent."
+              accent="border-slate-200 bg-slate-50"
             />
           </div>
         </section>
@@ -279,8 +386,8 @@ export default function Home() {
         >
           <SectionIntro
             eyebrow="Try the live demo"
-            title="Paste an AI answer and see how it scores"
-            description="Use the evaluator below to inspect a single answer or compare answers across AI models."
+            title="Evaluate AI answers instantly"
+            description="Paste a question and answers from one or more AI models to see which response is most reliable."
           />
 
           <section className="space-y-6 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
@@ -380,7 +487,7 @@ export default function Home() {
             />
           </div>
           <p className="text-sm text-slate-500">
-            Evaluate AI reasoning before you trust the output.
+            Compare AI answers. Understand the reasoning. Trust the result.
           </p>
         </footer>
       </div>
@@ -540,17 +647,17 @@ function CompareView({ result }: { result: CompareResult }) {
           </p>
         </Card>
 
-        <Card title="Answer A score">
+        <Card title="Model A score">
           <ScoreDisplay score={result.comparison.answer_a_score} />
         </Card>
 
-        <Card title="Answer B score">
+        <Card title="Model B score">
           <ScoreDisplay score={result.comparison.answer_b_score} />
         </Card>
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <Card title={`Answer A (${result.comparison.answer_a_score}/10)`}>
+        <Card title={`Model A (${result.comparison.answer_a_score}/10)`}>
           <p className="mb-3 font-medium text-slate-900">Strengths</p>
           <ul className="list-disc space-y-2 pl-5 text-slate-700">
             {result.comparison.answer_a_strengths.map((item, i) => (
@@ -566,7 +673,7 @@ function CompareView({ result }: { result: CompareResult }) {
           </ul>
         </Card>
 
-        <Card title={`Answer B (${result.comparison.answer_b_score}/10)`}>
+        <Card title={`Model B (${result.comparison.answer_b_score}/10)`}>
           <p className="mb-3 font-medium text-slate-900">Strengths</p>
           <ul className="list-disc space-y-2 pl-5 text-slate-700">
             {result.comparison.answer_b_strengths.map((item, i) => (
@@ -585,20 +692,20 @@ function CompareView({ result }: { result: CompareResult }) {
 
       <details className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
         <summary className="cursor-pointer text-lg font-semibold text-slate-900">
-          Show detailed audits for both answers
+          Show detailed audits for both models
         </summary>
 
         <div className="mt-5 space-y-8">
           <div>
             <h3 className="mb-4 text-xl font-semibold text-slate-900">
-              Answer A audit
+              Model A audit
             </h3>
             <SingleAnswerView result={result.answerA} />
           </div>
 
           <div>
             <h3 className="mb-4 text-xl font-semibold text-slate-900">
-              Answer B audit
+              Model B audit
             </h3>
             <SingleAnswerView result={result.answerB} />
           </div>
@@ -688,25 +795,25 @@ function ModeSelector({
     {
       key: 'blind_spots',
       title: 'Blind Spot Finder',
-      description: 'Find missing context and hidden assumptions.',
+      description: 'Find missing context and hidden assumptions in the AI’s reasoning.',
       icon: '🔎',
     },
     {
       key: 'risk_review',
       title: 'Risk Review',
-      description: 'Identify risks and possible failure scenarios.',
+      description: 'Identify risks, edge cases, and failure scenarios the AI may have ignored.',
       icon: '⚠️',
     },
     {
       key: 'devils_advocate',
       title: "Devil's Advocate",
-      description: 'Challenge the answer with strong counterarguments.',
+      description: "Generate strong counterarguments that challenge the AI's conclusion.",
       icon: '🧠',
     },
     {
       key: 'alternative_strategy',
       title: 'Alternative Strategy',
-      description: 'Suggest better or safer ways to solve the problem.',
+      description: 'Suggest better or safer approaches the AI may have overlooked.',
       icon: '🔁',
     },
   ];
@@ -715,11 +822,10 @@ function ModeSelector({
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold text-slate-900">
-          Choose how to stress-test the answer
+          Choose how to evaluate the AI answer
         </h3>
         <p className="mt-1 text-sm text-slate-600">
-          Analyze the response from different angles depending on what you want
-          to learn.
+          Analyze the response from different angles to uncover reasoning gaps and risks.
         </p>
       </div>
 
@@ -792,6 +898,33 @@ function DemoIssue({
         {label}
       </p>
       <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
+    </div>
+  );
+}
+
+function LeaderboardCard({
+  rank,
+  model,
+  score,
+  note,
+  accent,
+}: {
+  rank: string;
+  model: string;
+  score: string;
+  note: string;
+  accent: string;
+}) {
+  return (
+    <div className={`rounded-3xl border p-5 shadow-sm ${accent}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+        {rank}
+      </p>
+      <div className="mt-3 flex items-end justify-between gap-3">
+        <h3 className="text-lg font-semibold text-slate-900">{model}</h3>
+        <span className="text-3xl font-bold text-slate-950">{score}</span>
+      </div>
+      <p className="mt-3 text-sm leading-6 text-slate-600">{note}</p>
     </div>
   );
 }
