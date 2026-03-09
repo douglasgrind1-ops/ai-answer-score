@@ -118,13 +118,13 @@ export default function Home() {
   </h1>
 
   <p className="text-xl text-slate-600 max-w-3xl">
-    Instantly evaluate the reliability of AI answers.
-  </p>
+  Instantly evaluate the reliability of AI answers, compare competing responses,
+  and inspect the reasoning behind the score.
+</p>
 
-  <p className="text-sm text-slate-500 max-w-2xl">
-    Built for evaluating ChatGPT, Claude, Gemini, and other LLM responses.
-  </p>
-</header>
+<p className="text-sm text-slate-500 max-w-2xl">
+  Built for evaluating ChatGPT, Claude, Gemini, and other LLM responses.
+</p>
 
   <div className="grid gap-3 md:grid-cols-3">
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
