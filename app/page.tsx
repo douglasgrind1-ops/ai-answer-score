@@ -107,13 +107,44 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 p-6 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <header className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">AI Answer Score</h1>
-          <p className="text-slate-600 max-w-3xl">
-            Reconstruct an LLM answer, stress-test the reasoning, and compare two
-            answers side by side when needed.
-          </p>
-        </header>
+        <header className="space-y-6">
+  <div className="inline-flex items-center rounded-full border bg-white px-3 py-1 text-sm text-slate-600 shadow-sm">
+    AI answer reliability scoring
+  </div>
+
+  <div className="space-y-3">
+    <h1 className="text-5xl font-bold tracking-tight text-slate-900">
+      AI Answer Score
+    </h1>
+    <p className="max-w-3xl text-lg text-slate-600">
+      Instantly evaluate the reliability of AI answers, compare competing responses,
+      and inspect the reasoning behind the score.
+    </p>
+  </div>
+
+  <div className="grid gap-3 md:grid-cols-3">
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-slate-900">Instant score</p>
+      <p className="mt-1 text-sm text-slate-600">
+        See whether an answer is strong, weak, or context-dependent.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-slate-900">Reasoning audit</p>
+      <p className="mt-1 text-sm text-slate-600">
+        Inspect assumptions, gaps, risks, and failure scenarios.
+      </p>
+    </div>
+
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-slate-900">Compare answers</p>
+      <p className="mt-1 text-sm text-slate-600">
+        Decide which answer is more reliable and when the other one may be better.
+      </p>
+    </div>
+  </div>
+</header>
 
         <section className="bg-white border rounded-2xl p-5 shadow-sm space-y-4">
           <div className="flex items-center gap-3">
