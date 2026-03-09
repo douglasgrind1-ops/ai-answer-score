@@ -1,0 +1,24 @@
+<svg width="320" height="90" viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg">
+
+<rect width="320" height="90" rx="14" fill="#0f172a"/>
+
+<defs>
+  <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#60A5FA"/>
+    <stop offset="100%" stop-color="#7C3AED"/>
+  </linearGradient>
+</defs>
+
+<polygon points="40,10 70,40 40,70 10,40" fill="url(#grad)"/>
+
+<circle cx="40" cy="40" r="6" fill="white"/>
+
+<text x="90" y="38" font-size="16" fill="white" font-family="Inter, sans-serif" font-weight="600">
+AI Answer Score
+</text>
+
+<text x="90" y="60" font-size="14" fill="#94a3b8" font-family="Inter, sans-serif">
+Verified AI reliability
+</text>
+
+</svg>
