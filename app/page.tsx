@@ -108,7 +108,7 @@ export default function Home() {
     <main className="min-h-screen bg-slate-50 text-slate-900 p-6 md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <header className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight">AI Second Opinion</h1>
+          <h1 className="text-4xl font-bold tracking-tight">AI Answer Score</h1>
           <p className="text-slate-600 max-w-3xl">
             Reconstruct an LLM answer, stress-test the reasoning, and compare two
             answers side by side when needed.
