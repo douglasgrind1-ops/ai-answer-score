@@ -111,7 +111,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto space-y-8">
         <header className="space-y-6">
           <div className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm text-blue-700 shadow-sm">
-            AI answer reliability scoring
+            AI answer evaluation
           </div>
 
           <div className="space-y-3">
