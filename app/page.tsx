@@ -114,14 +114,16 @@ export default function Home() {
             AI answer evaluation
           </div>
 
-          <section className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div className="space-y-5">
-              <div className="space-y-4">
-                <p className="text-sm font-medium uppercase tracking-[0.18em] text-blue-700">
-                  AI Answer Score
-                </p>
+          <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div className="space-y-6">
+              <div className="space-y-5">
+                <img
+                  src="/assets/logo/ai-answer-score-logo.svg"
+                  alt="AI Answer Score"
+                  className="h-16 w-auto md:h-20"
+                />
 
-                <h1 className="max-w-4xl text-5xl md:text-6xl font-bold tracking-tight text-slate-950 leading-[1.05]">
+                <h1 className="max-w-4xl text-5xl font-bold tracking-tight text-slate-950 leading-[1.02] md:text-6xl">
                   A trust score for AI-generated answers
                 </h1>
 
@@ -143,6 +145,7 @@ export default function Home() {
                 >
                   Try the live demo
                 </a>
+
                 <a
                   href="#how-it-works"
                   className="rounded-xl border border-slate-300 bg-white/80 px-5 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-white"
@@ -150,10 +153,18 @@ export default function Home() {
                   See how it works
                 </a>
               </div>
+
+              <div className="pt-1">
+                <img
+                  src="/assets/logo/ai-answer-score-badge.svg"
+                  alt="AI Answer Score badge"
+                  className="h-14 w-auto"
+                />
+              </div>
             </div>
 
             <section className="rounded-3xl border border-blue-200 bg-white/85 p-6 shadow-lg backdrop-blur">
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium text-slate-500">
                     Example result
@@ -162,6 +173,7 @@ export default function Home() {
                     AI Answer Score
                   </h2>
                 </div>
+
                 <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
                   Moderately reliable
                 </span>
@@ -354,7 +366,11 @@ export default function Home() {
               }
               className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50"
             >
-              {loading ? 'Analyzing...' : compare ? 'Compare answers' : 'Analyze answer'}
+              {loading
+                ? 'Analyzing...'
+                : compare
+                ? 'Compare answers'
+                : 'Analyze answer'}
             </button>
 
             {error && <p className="text-red-600">{error}</p>}
@@ -365,7 +381,13 @@ export default function Home() {
         {result?.type === 'compare' && <CompareView result={result} />}
 
         <footer className="space-y-2 pb-4 pt-2 text-center">
-          <p className="text-sm font-medium text-slate-700">AI Answer Score</p>
+          <div className="flex justify-center">
+            <img
+              src="/assets/logo/ai-answer-score-horizontal.svg"
+              alt="AI Answer Score"
+              className="h-10 w-auto"
+            />
+          </div>
           <p className="text-sm text-slate-500">
             Evaluate AI reasoning before you trust the output.
           </p>
@@ -681,7 +703,7 @@ function SectionIntro({
       <h2 className="text-3xl font-bold tracking-tight text-slate-950">
         {title}
       </h2>
-      <p className="max-w-3xl text-slate-600 leading-7">{description}</p>
+      <p className="max-w-3xl leading-7 text-slate-600">{description}</p>
     </div>
   );
 }
@@ -879,7 +901,9 @@ function ScoreDisplay({ score }: { score: number }) {
       : 'border-red-100 bg-red-50 text-red-700';
 
   return (
-    <div className={`inline-flex items-end gap-2 rounded-2xl border px-4 py-3 ${color}`}>
+    <div
+      className={`inline-flex items-end gap-2 rounded-2xl border px-4 py-3 ${color}`}
+    >
       <span className="text-5xl font-bold leading-none">{score}</span>
       <span className="pb-1 text-lg font-medium">/10</span>
     </div>
