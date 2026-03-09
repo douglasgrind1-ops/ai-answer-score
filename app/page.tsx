@@ -109,7 +109,7 @@ export default function Home() {
       <div className="max-w-6xl mx-auto space-y-6">
         <header className="space-y-6">
   <div className="inline-flex items-center rounded-full border bg-white px-3 py-1 text-sm text-slate-600 shadow-sm">
-    AI answer reliability scoring
+    AI reliability scoring
   </div>
 
   <header className="space-y-4">
