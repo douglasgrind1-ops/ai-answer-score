@@ -112,15 +112,19 @@ export default function Home() {
     AI answer reliability scoring
   </div>
 
-  <div className="space-y-3">
-    <h1 className="text-5xl font-bold tracking-tight text-slate-900">
-      AI Answer Score
-    </h1>
-    <p className="max-w-3xl text-lg text-slate-600">
-      Instantly evaluate the reliability of AI answers, compare competing responses,
-      and inspect the reasoning behind the score.
-    </p>
-  </div>
+  <header className="space-y-4">
+  <h1 className="text-5xl font-bold tracking-tight text-slate-900">
+    AI Answer Score
+  </h1>
+
+  <p className="text-xl text-slate-600 max-w-3xl">
+    Instantly evaluate the reliability of AI answers.
+  </p>
+
+  <p className="text-sm text-slate-500 max-w-2xl">
+    Built for evaluating ChatGPT, Claude, Gemini, and other LLM responses.
+  </p>
+</header>
 
   <div className="grid gap-3 md:grid-cols-3">
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
