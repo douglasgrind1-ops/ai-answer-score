@@ -107,7 +107,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 text-slate-900 p-6 md:p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 text-slate-900 md:p-8">
       <div className="mx-auto max-w-6xl space-y-10">
         <header className="space-y-8">
           <div className="inline-flex items-center rounded-full border border-blue-300 bg-white/80 px-4 py-1.5 text-sm text-blue-700 shadow-sm backdrop-blur">
@@ -123,13 +123,14 @@ export default function Home() {
                   className="h-16 w-auto md:h-20"
                 />
 
-                <h1 className="max-w-4xl text-5xl font-bold tracking-tight text-slate-950 leading-[1.02] md:text-6xl">
+                <h1 className="max-w-4xl text-5xl font-bold leading-[1.02] tracking-tight text-slate-950 md:text-6xl">
                   A trust score for AI-generated answers
                 </h1>
 
                 <p className="max-w-3xl text-xl leading-relaxed text-slate-600">
-                  Score answer reliability, inspect the reasoning behind the score,
-                  and compare competing responses before you rely on them.
+                  Score answer reliability, inspect the reasoning behind the
+                  score, and compare competing responses before you rely on
+                  them.
                 </p>
 
                 <p className="max-w-2xl text-sm text-slate-500">
@@ -189,8 +190,8 @@ export default function Home() {
               </div>
 
               <p className="mt-4 text-sm leading-6 text-slate-600">
-                Strong core recommendation, but missing context and weak assumptions
-                reduce confidence.
+                Strong core recommendation, but missing context and weak
+                assumptions reduce confidence.
               </p>
 
               <div className="mt-6 space-y-3">
@@ -282,7 +283,7 @@ export default function Home() {
             description="Use the evaluator below to inspect a single answer or compare two competing responses."
           />
 
-          <section className="space-y-4 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
+          <section className="space-y-6 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
             <div className="flex items-center gap-3">
               <input
                 id="compare-mode"
@@ -299,24 +300,10 @@ export default function Home() {
               </label>
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-slate-800">
-                Review mode
-              </label>
-              <select
-                value={mode}
-                onChange={(e) => setMode(e.target.value as Mode)}
-                className="w-full rounded-xl border border-slate-300 bg-white p-3 outline-none focus:ring-2 focus:ring-blue-200 md:w-80"
-              >
-                <option value="blind_spots">Blind spots</option>
-                <option value="risk_review">Risk review</option>
-                <option value="devils_advocate">Devil&apos;s advocate</option>
-                <option value="alternative_strategy">Alternative strategy</option>
-              </select>
+            <ModeSelector mode={mode} setMode={setMode} />
 
-              <p className="mt-3 text-sm text-slate-600">
-                {getModeDescription(mode)}
-              </p>
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+              {getModeDescription(mode)}
             </div>
           </section>
 
@@ -686,6 +673,78 @@ function StepCard({
   );
 }
 
+function ModeSelector({
+  mode,
+  setMode,
+}: {
+  mode: Mode;
+  setMode: (m: Mode) => void;
+}) {
+  const modes = [
+    {
+      key: 'blind_spots',
+      title: 'Blind Spot Finder',
+      description: 'Find missing context and hidden assumptions.',
+      icon: '🔎',
+    },
+    {
+      key: 'risk_review',
+      title: 'Risk Review',
+      description: 'Identify risks and possible failure scenarios.',
+      icon: '⚠️',
+    },
+    {
+      key: 'devils_advocate',
+      title: "Devil's Advocate",
+      description: 'Challenge the answer with strong counterarguments.',
+      icon: '🧠',
+    },
+    {
+      key: 'alternative_strategy',
+      title: 'Alternative Strategy',
+      description: 'Suggest better or safer ways to solve the problem.',
+      icon: '🔁',
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold text-slate-900">
+          Choose how to stress-test the answer
+        </h3>
+        <p className="mt-1 text-sm text-slate-600">
+          Analyze the response from different angles depending on what you want
+          to learn.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {modes.map((m) => (
+          <button
+            key={m.key}
+            type="button"
+            onClick={() => setMode(m.key as Mode)}
+            className={`rounded-2xl border p-4 text-left transition ${
+              mode === m.key
+                ? 'border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-100'
+                : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40'
+            }`}
+          >
+            <div className="text-lg">{m.icon}</div>
+
+            <p className="mt-3 font-semibold text-slate-900">{m.title}</p>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {m.description}
+            </p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SectionIntro({
   eyebrow,
   title,
@@ -814,7 +873,9 @@ function ClaimReviewCard({
                 <SeverityBadge level={item.severity} />
                 <div>
                   <p className="font-medium text-slate-900">{item.claim}</p>
-                  <p className="mt-1 leading-7 text-slate-700">{item.concern}</p>
+                  <p className="mt-1 leading-7 text-slate-700">
+                    {item.concern}
+                  </p>
                 </div>
               </div>
             </div>
