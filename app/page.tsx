@@ -129,7 +129,7 @@ export default function Home() {
 
                 <p className="max-w-3xl text-xl leading-relaxed text-slate-600">
                   Score answer reliability, inspect the reasoning behind the
-                  score, and compare competing responses before you rely on
+                  score, and compare answers across AI models before you rely on
                   them.
                 </p>
 
@@ -240,8 +240,8 @@ export default function Home() {
               className="border-indigo-200 bg-indigo-100/70"
             />
             <FeatureCard
-              title="Compare competing responses"
-              description="Decide which answer is more reliable and when the alternative may actually be better."
+              title="See which AI answered best"
+              description="Compare answers across AI models and understand why one response scored higher."
               className="border-cyan-200 bg-cyan-100/70"
             />
           </div>
@@ -251,14 +251,14 @@ export default function Home() {
           <SectionIntro
             eyebrow="How it works"
             title="From pasted answer to reasoning audit"
-            description="Drop in a question and one or two LLM answers. Get a trust score, a concise verdict, and a deeper reasoning breakdown."
+            description="Drop in a question and one or two AI answers. Get a trust score, a concise verdict, and a deeper reasoning breakdown."
           />
 
           <div className="grid gap-4 md:grid-cols-3">
             <StepCard
               step="01"
               title="Paste the question and answer"
-              description="Use any answer from ChatGPT, Claude, Gemini, or another LLM."
+              description="Use any answer from ChatGPT, Claude, Gemini, or another AI model."
             />
             <StepCard
               step="02"
@@ -267,8 +267,8 @@ export default function Home() {
             />
             <StepCard
               step="03"
-              title="Explore the reasoning"
-              description="Open the audit to inspect assumptions, missing risks, and compare two answers side by side."
+              title="Compare across models"
+              description="See which AI answered best and inspect assumptions, missing risks, and reasoning gaps."
             />
           </div>
         </section>
@@ -280,7 +280,7 @@ export default function Home() {
           <SectionIntro
             eyebrow="Try the live demo"
             title="Paste an AI answer and see how it scores"
-            description="Use the evaluator below to inspect a single answer or compare two competing responses."
+            description="Use the evaluator below to inspect a single answer or compare answers across AI models."
           />
 
           <section className="space-y-6 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
@@ -296,7 +296,7 @@ export default function Home() {
                 htmlFor="compare-mode"
                 className="text-base font-medium text-slate-800"
               >
-                Compare two answers
+                Compare AI models
               </label>
             </div>
 
@@ -321,21 +321,25 @@ export default function Home() {
               />
             </Card>
 
-            <Card title={compare ? 'LLM answer A' : 'LLM answer'}>
+            <Card title={compare ? 'Primary AI model answer' : 'AI model answer'}>
               <textarea
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Paste the first LLM response here..."
+                placeholder={
+                  compare
+                    ? 'Paste the first model answer here (for example ChatGPT)...'
+                    : 'Paste the AI model response here...'
+                }
                 className="h-56 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 outline-none focus:ring-2 focus:ring-blue-200"
               />
             </Card>
 
             {compare && (
-              <Card title="LLM answer B">
+              <Card title="Comparison AI model answer">
                 <textarea
                   value={answerB}
                   onChange={(e) => setAnswerB(e.target.value)}
-                  placeholder="Paste the second LLM response here..."
+                  placeholder="Paste the second model answer here (for example Claude or Gemini)..."
                   className="h-56 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </Card>
@@ -356,7 +360,7 @@ export default function Home() {
               {loading
                 ? 'Analyzing...'
                 : compare
-                ? 'Compare answers'
+                ? 'Compare AI models'
                 : 'Analyze answer'}
             </button>
 
