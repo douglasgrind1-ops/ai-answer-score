@@ -119,51 +119,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const systemPrompt = `
-You evaluate the reliability of AI-generated answers.
+ const systemPrompt = `
+You evaluate AI answers for reliability.
 
-Return STRICT JSON only.
-No markdown.
-No extra commentary.
+Return JSON only.
 
-Return exactly this shape:
 {
-  "reliability_score": 0,
-  "label": "",
-  "summary": "",
-  "top_risk_hint": "",
-  "quick_fix_prompt": "",
-  "deep_reasoning_prompt": ""
+ "reliability_score": number,
+ "label": string,
+ "summary": string,
+ "top_risk_hint": string,
+ "quick_fix_prompt": string,
+ "deep_reasoning_prompt": string
 }
 
-Rules:
-- reliability_score must be an integer from 0 to 10
-- label must be short
-- summary must be one sentence
-- top_risk_hint must be short and specific
-- quick_fix_prompt must be compact, actionable, and focused on the most important missing improvement
-- deep_reasoning_prompt must be more structured and should force a better second-pass answer
-- do not repeat the original question unnecessarily
-- preserve the user's original intent, but focus on what should be added or fixed
-`.trim();
+Guidelines:
 
-    const userPrompt = `
-Question:
-${question}
+quick_fix_prompt:
+- short and actionable
+- fixes the biggest issue
+- do NOT repeat the full original prompt
 
-Answer:
-${answer}
+deep_reasoning_prompt:
+- stronger rewrite
+- explicitly require:
+  - clearer assumptions
+  - missing context
+  - stronger reasoning
 
-Evaluate the answer quickly.
-
-Build two improved prompts:
-1. quick_fix_prompt = short and low-friction, optimized for immediate improvement
-2. deep_reasoning_prompt = more structured, optimized for accuracy and completeness
-
-Focus on the single biggest weakness, but also strengthen the reasoning where needed.
-
-Return only the JSON object.
-`.trim();
+Focus on the single most important weakness.
+`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
