@@ -260,6 +260,16 @@ export default async function AnalyzePage({
             </p>
           </SectionCard>
         </div>
+
+        <section className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
+    <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+    Debug Response
+  </div>
+  <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-700">
+    {JSON.stringify(analysis, null, 2)}
+  </pre>
+  </section>
+        
       </div>
     </main>
   );
