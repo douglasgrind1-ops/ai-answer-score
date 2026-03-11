@@ -49,7 +49,7 @@ function parseJson(text: string): Partial<LiteResponse> {
   }
 }
 
-function fallbackQuickFixPrompt(question: string, topRiskHint: string): string {
+function fallbackQuickFixPrompt(topRiskHint: string): string {
   return `Answer the question again, but improve the answer by addressing this issue: ${topRiskHint} Keep the response concise, clearer, and better supported.`;
 }
 
@@ -73,7 +73,7 @@ function sanitizeResponse(
   );
   const quick_fix_prompt = safeString(
     data.quick_fix_prompt,
-    fallbackQuickFixPrompt(question, top_risk_hint)
+    fallbackQuickFixPrompt(top_risk_hint)
   );
   const deep_reasoning_prompt = safeString(
     data.deep_reasoning_prompt,
