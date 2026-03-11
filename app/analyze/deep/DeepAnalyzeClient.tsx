@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type StressItem = {
   text: string;
   impact?: string;
+};
+
+type ClaimReview = {
+  claim: string;
+  concern: string;
+  severity?: string;
 };
 
 type FullAnalysisResponse = {
@@ -25,11 +31,7 @@ type FullAnalysisResponse = {
     reasoning_gaps?: StressItem[];
     failure_scenarios?: StressItem[];
     alternative_perspective?: string;
-    claim_reviews?: Array<{
-      claim: string;
-      concern: string;
-      severity?: string;
-    }>;
+    claim_reviews?: ClaimReview[];
   };
   error?: string;
 };
@@ -47,6 +49,12 @@ function scoreColorClasses(score: number) {
   if (score >= 7) return "text-indigo-600";
   if (score >= 5) return "text-amber-500";
   return "text-red-500";
+}
+
+function truncateText(text: string, maxLength: number) {
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trim()}…`;
 }
 
 function SectionCard({
@@ -120,6 +128,57 @@ function StringList({ items }: { items?: string[] }) {
   );
 }
 
+function ClaimReviewList({ items }: { items?: ClaimReview[] }) {
+  if (!items || items.length === 0) {
+    return (
+      <p className="text-sm leading-7 text-slate-600">
+        No claim-level review was returned.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {items.map((item, index) => (
+        <div
+          key={`${item.claim}-${index}`}
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4"
+        >
+          <div className="text-sm font-semibold text-slate-900">
+            {item.claim}
+          </div>
+          <p className="mt-2 text-sm leading-7 text-slate-700">
+            {item.concern}
+          </p>
+          {item.severity ? (
+            <div className="mt-3 inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
+              {item.severity} severity
+            </div>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function buildDeepReasoningPrompt(
+  question: string,
+  analysis: FullAnalysisResponse | null
+) {
+  const stress = analysis?.stress_test;
+
+  const weakestAssumption =
+    stress?.weakest_assumptions?.[0]?.text || "unclear assumptions";
+
+  const missingRisk =
+    stress?.missing_risks?.[0]?.text || "missing risks or constraints";
+
+  const reasoningGap =
+    stress?.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
+
+  return `Answer the question again with stronger reasoning. Address the weak assumption about ${weakestAssumption}. Also account for ${missingRisk}, and fix this reasoning gap: ${reasoningGap}. Give a clearer, better-structured answer to: ${question}`;
+}
+
 export default function DeepAnalyzeClient({
   question,
   answer,
@@ -189,6 +248,18 @@ export default function DeepAnalyzeClient({
 
   const label = score !== null ? scoreToLabel(score) : "Unavailable";
 
+  const keyReliabilityRisk =
+    stressTest?.missing_risks?.[0]?.text ||
+    stressTest?.weakest_assumptions?.[0]?.text ||
+    stressTest?.reasoning_gaps?.[0]?.text ||
+    "No single dominant reliability risk was identified.";
+
+  const deepReasoningPrompt = useMemo(() => {
+    return buildDeepReasoningPrompt(question, analysis);
+  }, [question, analysis]);
+
+  const answerPreview = useMemo(() => truncateText(answer, 900), [answer]);
+
   if (isLoading) {
     return (
       <div className="grid gap-6">
@@ -198,7 +269,8 @@ export default function DeepAnalyzeClient({
           </div>
           <div className="mt-6 grid gap-4">
             <div className="h-24 rounded-2xl bg-slate-100 animate-pulse" />
-            <div className="h-40 rounded-2xl bg-slate-100 animate-pulse" />
+            <div className="h-32 rounded-2xl bg-slate-100 animate-pulse" />
+            <div className="h-32 rounded-2xl bg-slate-100 animate-pulse" />
             <div className="h-40 rounded-2xl bg-slate-100 animate-pulse" />
           </div>
         </div>
@@ -240,32 +312,34 @@ export default function DeepAnalyzeClient({
             <p className="mt-2 text-base leading-7 text-slate-900">
               {error ||
                 stressTest?.summary ||
-                "No full analysis is available yet."}
+                "No deep analysis is available yet."}
             </p>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-            Better Prompt
+        <SectionCard eyebrow="Key Reliability Risk" title="Highest-Impact Issue">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
+            <p className="text-base leading-7 text-slate-900">
+              {keyReliabilityRisk}
+            </p>
           </div>
-          <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-            {stressTest?.best_follow_up_question ||
-              "No improved prompt is available yet."}
-          </p>
-        </div>
+        </SectionCard>
       </div>
 
-      <SectionCard eyebrow="Original Question" title="Question">
-        <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-          {question || "No question provided."}
-        </p>
-      </SectionCard>
+      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
+        <div className="space-y-4">
+          <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+            {deepReasoningPrompt}
+          </p>
 
-      <SectionCard eyebrow="AI Answer" title="Answer">
-        <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-          {answer || "No answer provided."}
-        </p>
+          <button
+            type="button"
+            onClick={() => navigator.clipboard.writeText(deepReasoningPrompt)}
+            className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          >
+            Copy Prompt
+          </button>
+        </div>
       </SectionCard>
 
       <SectionCard eyebrow="Reliability" title="Why This Score">
@@ -276,30 +350,27 @@ export default function DeepAnalyzeClient({
       </SectionCard>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <SectionCard eyebrow="What’s Missing" title="Weak Assumptions">
+        <SectionCard eyebrow="Reasoning Audit" title="Weak Assumptions">
           <BulletList items={stressTest?.weakest_assumptions} />
         </SectionCard>
 
-        <SectionCard eyebrow="What’s Missing" title="Missing Risks">
+        <SectionCard eyebrow="Reasoning Audit" title="Missing Risks">
           <BulletList items={stressTest?.missing_risks} />
         </SectionCard>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <SectionCard eyebrow="Deep Analysis" title="Reasoning Gaps">
+        <SectionCard eyebrow="Reasoning Audit" title="Reasoning Gaps">
           <BulletList items={stressTest?.reasoning_gaps} />
         </SectionCard>
 
-        <SectionCard eyebrow="Deep Analysis" title="Failure Scenarios">
+        <SectionCard eyebrow="Reasoning Audit" title="Failure Scenarios">
           <BulletList items={stressTest?.failure_scenarios} />
         </SectionCard>
       </div>
 
-      <SectionCard eyebrow="Alternative Perspective" title="Another Angle">
-        <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-          {stressTest?.alternative_perspective ||
-            "No alternative perspective was returned."}
-        </p>
+      <SectionCard eyebrow="Claim Review" title="Claim-Level Concerns">
+        <ClaimReviewList items={stressTest?.claim_reviews} />
       </SectionCard>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -324,7 +395,43 @@ export default function DeepAnalyzeClient({
           eyebrow="Reconstruction"
           title="Uncertain or Context-Dependent Claims"
         >
-          <StringList items={reconstruction?.uncertain_or_context_dependent_claims} />
+          <StringList
+            items={reconstruction?.uncertain_or_context_dependent_claims}
+          />
+        </SectionCard>
+      </div>
+
+      <SectionCard eyebrow="Alternative Perspective" title="Another Angle">
+        <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+          {stressTest?.alternative_perspective ||
+            "No alternative perspective was returned."}
+        </p>
+      </SectionCard>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SectionCard eyebrow="Original Question" title="Question">
+          <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+            {question || "No question provided."}
+          </p>
+        </SectionCard>
+
+        <SectionCard eyebrow="AI Answer" title="Answer Preview">
+          <div className="space-y-4">
+            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+              {answerPreview || "No answer provided."}
+            </p>
+
+            {answer.length > 900 ? (
+              <details className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+                  Show full answer
+                </summary>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                  {answer}
+                </p>
+              </details>
+            ) : null}
+          </div>
         </SectionCard>
       </div>
     </div>
