@@ -5,35 +5,12 @@ type AnalyzePageProps = {
   }>;
 };
 
-type StressItem = {
-  text: string;
-  impact?: string;
-};
-
-type FullAnalysisResponse = {
-  type?: string;
-  reconstruction?: {
-    main_conclusion?: string;
-    supporting_claims?: string[];
-    assumptions?: string[];
-    uncertain_or_context_dependent_claims?: string[];
-  };
-  stress_test?: {
-    reliability_score?: number;
-    summary?: string;
-    reliability_explanation?: string;
-    best_follow_up_question?: string;
-    weakest_assumptions?: StressItem[];
-    missing_risks?: StressItem[];
-    reasoning_gaps?: StressItem[];
-    failure_scenarios?: StressItem[];
-    alternative_perspective?: string;
-    claim_reviews?: Array<{
-      claim: string;
-      concern: string;
-      severity?: string;
-    }>;
-  };
+type LiteAnalysisResponse = {
+  reliability_score?: number;
+  label?: string;
+  summary?: string;
+  top_risk_hint?: string;
+  better_prompt?: string;
   error?: string;
 };
 
@@ -52,10 +29,16 @@ function scoreColorClasses(score: number) {
   return "text-red-500";
 }
 
-async function getFullAnalysis(
+function truncateText(text: string, maxLength: number) {
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trim()}…`;
+}
+
+async function getLiteAnalysis(
   question: string,
   answer: string
-): Promise<FullAnalysisResponse | null> {
+): Promise<LiteAnalysisResponse | null> {
   if (!question || !answer) return null;
 
   const baseUrl =
@@ -67,7 +50,7 @@ async function getFullAnalysis(
         : "https://www.aianswerscore.com");
 
   try {
-    const res = await fetch(`${baseUrl}/api/analyze`, {
+    const res = await fetch(`${baseUrl}/api/analyze-lite`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,17 +62,17 @@ async function getFullAnalysis(
     if (!res.ok) {
       const text = await res.text();
       return {
-        error: text || "Failed to run full analysis.",
+        error: text || "Failed to run analysis.",
       };
     }
 
-    return (await res.json()) as FullAnalysisResponse;
+    return (await res.json()) as LiteAnalysisResponse;
   } catch (error) {
     return {
       error:
         error instanceof Error
           ? error.message
-          : "Unknown error while running full analysis.",
+          : "Unknown error while running analysis.",
     };
   }
 }
@@ -114,57 +97,6 @@ function SectionCard({
   );
 }
 
-function BulletList({ items }: { items?: StressItem[] }) {
-  if (!items || items.length === 0) {
-    return (
-      <p className="text-sm leading-7 text-slate-600">
-        No major issues were surfaced in this section.
-      </p>
-    );
-  }
-
-  return (
-    <ul className="space-y-3">
-      {items.map((item, index) => (
-        <li
-          key={`${item.text}-${index}`}
-          className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
-        >
-          <div className="text-sm leading-7 text-slate-900">{item.text}</div>
-          {item.impact ? (
-            <div className="mt-2 inline-flex rounded-full bg-slate-200 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-slate-700">
-              {item.impact} impact
-            </div>
-          ) : null}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function StringList({ items }: { items?: string[] }) {
-  if (!items || items.length === 0) {
-    return (
-      <p className="text-sm leading-7 text-slate-600">
-        No additional information was returned in this section.
-      </p>
-    );
-  }
-
-  return (
-    <ul className="space-y-3">
-      {items.map((item, index) => (
-        <li
-          key={`${item}-${index}`}
-          className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-900"
-        >
-          {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 export default async function AnalyzePage({
   searchParams,
 }: AnalyzePageProps) {
@@ -172,16 +104,19 @@ export default async function AnalyzePage({
   const question = params.question || "";
   const answer = params.answer || "";
 
-  const analysis = await getFullAnalysis(question, answer);
-  const stressTest = analysis?.stress_test;
-  const reconstruction = analysis?.reconstruction;
+  const analysis = await getLiteAnalysis(question, answer);
 
   const score =
-    typeof stressTest?.reliability_score === "number"
-      ? stressTest.reliability_score
+    typeof analysis?.reliability_score === "number"
+      ? analysis.reliability_score
       : null;
 
-  const label = score !== null ? scoreToLabel(score) : "Unavailable";
+  const label =
+    score !== null
+      ? analysis?.label || scoreToLabel(score)
+      : "Unavailable";
+
+  const answerPreview = truncateText(answer, 700);
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] text-slate-900">
@@ -195,8 +130,8 @@ export default async function AnalyzePage({
             <span>AI Answer Score</span>
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-            Full analysis for the AI-generated answer, including verdict,
-            missing context, stronger prompting, and deeper reasoning gaps.
+            A fast analysis of the AI-generated answer, with the highest-priority
+            issues surfaced first and a stronger next-step prompt.
           </p>
         </div>
 
@@ -230,9 +165,9 @@ export default async function AnalyzePage({
                 Verdict
               </div>
               <p className="mt-2 text-base leading-7 text-slate-900">
-                {stressTest?.summary ||
+                {analysis?.summary ||
                   analysis?.error ||
-                  "No full analysis is available yet."}
+                  "No analysis is available yet."}
               </p>
             </div>
           </div>
@@ -242,89 +177,65 @@ export default async function AnalyzePage({
               Better Prompt
             </div>
             <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-              {stressTest?.best_follow_up_question ||
+              {analysis?.better_prompt ||
                 "No improved prompt is available yet."}
             </p>
           </div>
         </div>
 
         <div className="grid gap-6">
-          <SectionCard eyebrow="Original Question" title="Question">
-            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-              {question || "No question provided."}
-            </p>
-          </SectionCard>
-
-          <SectionCard eyebrow="AI Answer" title="Answer">
-            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-              {answer || "No answer provided."}
-            </p>
-          </SectionCard>
-
-          <SectionCard eyebrow="Reliability" title="Why This Score">
-            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-              {stressTest?.reliability_explanation ||
-                "No reliability explanation was returned."}
-            </p>
+          <SectionCard eyebrow="What’s Missing" title="Highest-Priority Issue">
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
+              <p className="text-base leading-7 text-slate-900">
+                {analysis?.top_risk_hint || "No major issue surfaced."}
+              </p>
+            </div>
           </SectionCard>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard eyebrow="What’s Missing" title="Weak Assumptions">
-              <BulletList items={stressTest?.weakest_assumptions} />
-            </SectionCard>
-
-            <SectionCard eyebrow="What’s Missing" title="Missing Risks">
-              <BulletList items={stressTest?.missing_risks} />
-            </SectionCard>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard eyebrow="Deep Analysis" title="Reasoning Gaps">
-              <BulletList items={stressTest?.reasoning_gaps} />
-            </SectionCard>
-
-            <SectionCard eyebrow="Deep Analysis" title="Failure Scenarios">
-              <BulletList items={stressTest?.failure_scenarios} />
-            </SectionCard>
-          </div>
-
-          <SectionCard eyebrow="Alternative Perspective" title="Another Angle">
-            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-              {stressTest?.alternative_perspective ||
-                "No alternative perspective was returned."}
-            </p>
-          </SectionCard>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard eyebrow="Reconstruction" title="Main Conclusion">
+            <SectionCard eyebrow="Original Question" title="Question">
               <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
-                {reconstruction?.main_conclusion ||
-                  "No main conclusion was reconstructed."}
+                {question || "No question provided."}
               </p>
             </SectionCard>
 
-            <SectionCard eyebrow="Reconstruction" title="Supporting Claims">
-              <StringList items={reconstruction?.supporting_claims} />
+            <SectionCard eyebrow="AI Answer" title="Answer Preview">
+              <div className="space-y-4">
+                <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+                  {answerPreview || "No answer provided."}
+                </p>
+
+                {answer.length > 700 ? (
+                  <details className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+                      Show full answer
+                    </summary>
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                      {answer}
+                    </p>
+                  </details>
+                ) : null}
+              </div>
             </SectionCard>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <SectionCard eyebrow="Reconstruction" title="Underlying Assumptions">
-              <StringList items={reconstruction?.assumptions} />
-            </SectionCard>
+          <SectionCard eyebrow="Next Step" title="Deep Analysis">
+            <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-2xl text-sm leading-7 text-slate-700">
+                This page is intentionally fast and focused. For a full reasoning
+                audit with weak assumptions, missing risks, reasoning gaps, and
+                failure scenarios, run the deeper inspection next.
+              </p>
 
-            <SectionCard
-              eyebrow="Reconstruction"
-              title="Uncertain or Context-Dependent Claims"
-            >
-              <StringList items={reconstruction?.uncertain_or_context_dependent_claims} />
-            </SectionCard>
-          </div>
-
-          <SectionCard eyebrow="Debug" title="Debug Response">
-            <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-700">
-              {JSON.stringify(analysis, null, 2)}
-            </pre>
+              <a
+                href={`/analyze/deep?question=${encodeURIComponent(
+                  question
+                )}&answer=${encodeURIComponent(answer)}`}
+                className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+              >
+                Run Deep Analysis
+              </a>
+            </div>
           </SectionCard>
         </div>
       </div>
