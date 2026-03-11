@@ -109,13 +109,11 @@ export async function POST(req: NextRequest) {
     }
 
     const systemPrompt = `
-You are evaluating the reliability of an AI-generated answer.
+You evaluate the reliability of AI-generated answers.
 
 Return STRICT JSON only.
-Do not include markdown.
-Do not include explanation outside JSON.
 
-Required JSON shape:
+Return exactly:
 {
   "reliability_score": 0,
   "label": "",
@@ -124,13 +122,12 @@ Required JSON shape:
   "better_prompt": ""
 }
 
-Rules:
-- reliability_score must be an integer from 0 to 10
-- label should be short, like "Strong" or "Use caution"
-- summary should be 1 short sentence
-- top_risk_hint should be very short, like "⚠ Weak assumptions"
-- better_prompt should be a rewritten prompt the user can send back to ChatGPT
-- better_prompt must preserve the original question but fix missing context, weak assumptions, or missing comparison criteria
+Constraints:
+- reliability_score: integer 0 to 10
+- label: max 3 words
+- summary: max 14 words
+- top_risk_hint: max 6 words
+- better_prompt: max 70 words
 `.trim();
 
     const userPrompt = `
@@ -140,25 +137,28 @@ ${question}
 Answer:
 ${answer}
 
-Evaluate this answer quickly and return only the JSON object.
+Score the answer quickly.
+Focus on the single biggest weakness that most affects answer quality.
+Return only the JSON object.
 `.trim();
-
+    
     const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.2,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${apiKey}`,
+  },
+  body: JSON.stringify({
+    model: "gpt-4.1-mini",
+    temperature: 0.1,
+    max_tokens: 220,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+  }),
+});
 
     if (!openaiRes.ok) {
       const errorText = await openaiRes.text();
