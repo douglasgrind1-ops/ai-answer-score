@@ -5,29 +5,34 @@ type AnalyzePageProps = {
   }>;
 };
 
+type StressItem = {
+  text: string;
+  impact?: string;
+};
+
 type FullAnalysisResponse = {
+  type?: string;
+  reconstruction?: {
+    main_conclusion?: string;
+    supporting_claims?: string[];
+    assumptions?: string[];
+    uncertain_or_context_dependent_claims?: string[];
+  };
   stress_test?: {
     reliability_score?: number;
     summary?: string;
     reliability_explanation?: string;
     best_follow_up_question?: string;
-    weakest_assumptions?: Array<{
-      text: string;
-      impact?: string;
-    }>;
-    missing_risks?: Array<{
-      text: string;
-      impact?: string;
-    }>;
-    reasoning_gaps?: Array<{
-      text: string;
-      impact?: string;
-    }>;
-    failure_scenarios?: Array<{
-      text: string;
-      impact?: string;
-    }>;
+    weakest_assumptions?: StressItem[];
+    missing_risks?: StressItem[];
+    reasoning_gaps?: StressItem[];
+    failure_scenarios?: StressItem[];
     alternative_perspective?: string;
+    claim_reviews?: Array<{
+      claim: string;
+      concern: string;
+      severity?: string;
+    }>;
   };
   error?: string;
 };
@@ -55,11 +60,11 @@ async function getFullAnalysis(
 
   const baseUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith("http")
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith("http")
       ? process.env.VERCEL_PROJECT_PRODUCTION_URL
       : process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://www.aianswerscore.com";
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "https://www.aianswerscore.com");
 
   try {
     const res = await fetch(`${baseUrl}/api/analyze`, {
@@ -109,11 +114,7 @@ function SectionCard({
   );
 }
 
-function BulletList({
-  items,
-}: {
-  items: Array<{ text: string; impact?: string }> | undefined;
-}) {
+function BulletList({ items }: { items?: StressItem[] }) {
   if (!items || items.length === 0) {
     return (
       <p className="text-sm leading-7 text-slate-600">
@@ -141,6 +142,29 @@ function BulletList({
   );
 }
 
+function StringList({ items }: { items?: string[] }) {
+  if (!items || items.length === 0) {
+    return (
+      <p className="text-sm leading-7 text-slate-600">
+        No additional information was returned in this section.
+      </p>
+    );
+  }
+
+  return (
+    <ul className="space-y-3">
+      {items.map((item, index) => (
+        <li
+          key={`${item}-${index}`}
+          className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-900"
+        >
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function AnalyzePage({
   searchParams,
 }: AnalyzePageProps) {
@@ -150,6 +174,7 @@ export default async function AnalyzePage({
 
   const analysis = await getFullAnalysis(question, answer);
   const stressTest = analysis?.stress_test;
+  const reconstruction = analysis?.reconstruction;
 
   const score =
     typeof stressTest?.reliability_score === "number"
@@ -182,14 +207,18 @@ export default async function AnalyzePage({
             </div>
             <div className="flex items-end gap-3">
               <div
-                className={`text-6xl font-extrabold tracking-tight ${score !== null ? scoreColorClasses(score) : "text-slate-400"}`}
+                className={`text-6xl font-extrabold tracking-tight ${
+                  score !== null ? scoreColorClasses(score) : "text-slate-400"
+                }`}
               >
                 {score !== null ? score : "—"}
               </div>
               <div className="pb-2">
                 <div className="text-lg font-semibold text-slate-500">/10</div>
                 <div
-                  className={`mt-1 text-sm font-semibold ${score !== null ? scoreColorClasses(score) : "text-slate-500"}`}
+                  className={`mt-1 text-sm font-semibold ${
+                    score !== null ? scoreColorClasses(score) : "text-slate-500"
+                  }`}
                 >
                   {label}
                 </div>
@@ -232,6 +261,13 @@ export default async function AnalyzePage({
             </p>
           </SectionCard>
 
+          <SectionCard eyebrow="Reliability" title="Why This Score">
+            <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+              {stressTest?.reliability_explanation ||
+                "No reliability explanation was returned."}
+            </p>
+          </SectionCard>
+
           <div className="grid gap-6 lg:grid-cols-2">
             <SectionCard eyebrow="What’s Missing" title="Weak Assumptions">
               <BulletList items={stressTest?.weakest_assumptions} />
@@ -255,21 +291,42 @@ export default async function AnalyzePage({
           <SectionCard eyebrow="Alternative Perspective" title="Another Angle">
             <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
               {stressTest?.alternative_perspective ||
-                stressTest?.reliability_explanation ||
                 "No alternative perspective was returned."}
             </p>
           </SectionCard>
-        </div>
 
-        <section className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
-    <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-    Debug Response
-  </div>
-  <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-700">
-    {JSON.stringify(analysis, null, 2)}
-  </pre>
-  </section>
-        
+          <div className="grid gap-6 lg:grid-cols-2">
+            <SectionCard eyebrow="Reconstruction" title="Main Conclusion">
+              <p className="whitespace-pre-wrap text-base leading-8 text-slate-900">
+                {reconstruction?.main_conclusion ||
+                  "No main conclusion was reconstructed."}
+              </p>
+            </SectionCard>
+
+            <SectionCard eyebrow="Reconstruction" title="Supporting Claims">
+              <StringList items={reconstruction?.supporting_claims} />
+            </SectionCard>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <SectionCard eyebrow="Reconstruction" title="Underlying Assumptions">
+              <StringList items={reconstruction?.assumptions} />
+            </SectionCard>
+
+            <SectionCard
+              eyebrow="Reconstruction"
+              title="Uncertain or Context-Dependent Claims"
+            >
+              <StringList items={reconstruction?.uncertain_or_context_dependent_claims} />
+            </SectionCard>
+          </div>
+
+          <SectionCard eyebrow="Debug" title="Debug Response">
+            <pre className="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-700">
+              {JSON.stringify(analysis, null, 2)}
+            </pre>
+          </SectionCard>
+        </div>
       </div>
     </main>
   );
