@@ -7,7 +7,6 @@ type LiteResponse = {
   label?: string;
   summary?: string;
   top_risk_hint?: string;
-  quick_fix_prompt?: string;
   deep_reasoning_prompt?: string;
   error?: string;
 };
@@ -191,59 +190,34 @@ export default function AnalyzeClient({
         </SectionCard>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <SectionCard eyebrow="Quick Fix Prompt" title="Fast Improvement">
-          {isLoading ? (
-            <div className="space-y-3">
-              <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
-              <div className="h-4 w-full rounded bg-slate-100 animate-pulse" />
-              <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-                {analysis?.quick_fix_prompt || "No quick fix prompt is available yet."}
-              </p>
-              <button
-                type="button"
-                onClick={() =>
-                  navigator.clipboard.writeText(analysis?.quick_fix_prompt || "")
-                }
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Copy Prompt
-              </button>
-            </div>
-          )}
-        </SectionCard>
+        <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
+  {isLoading ? (
+    <div className="space-y-3">
+      <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
+      <div className="h-4 w-full rounded bg-slate-100 animate-pulse" />
+      <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
+    </div>
+  ) : (
+    <div className="space-y-4">
+      <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+        {analysis?.deep_reasoning_prompt ||
+          "No deep reasoning prompt is available yet."}
+      </p>
 
-        <SectionCard eyebrow="Deep Reasoning Prompt" title="Stronger Second Pass">
-          {isLoading ? (
-            <div className="space-y-3">
-              <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
-              <div className="h-4 w-full rounded bg-slate-100 animate-pulse" />
-              <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-                {analysis?.deep_reasoning_prompt ||
-                  "No deep reasoning prompt is available yet."}
-              </p>
-              <button
-                type="button"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    analysis?.deep_reasoning_prompt || ""
-                  )
-                }
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Copy Prompt
-              </button>
-            </div>
-          )}
-        </SectionCard>
+      <button
+        type="button"
+        onClick={() =>
+          navigator.clipboard.writeText(
+            analysis?.deep_reasoning_prompt || ""
+          )
+        }
+        className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+      >
+        Copy Prompt
+      </button>
+    </div>
+  )}
+</SectionCard>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
