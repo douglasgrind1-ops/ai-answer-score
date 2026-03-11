@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type LiteAnalysisResponse = {
+type LiteResponse = {
   reliability_score?: number;
   label?: string;
   summary?: string;
   top_risk_hint?: string;
-  better_prompt?: string;
+  quick_fix_prompt?: string;
+  deep_reasoning_prompt?: string;
   error?: string;
 };
 
@@ -59,7 +60,7 @@ export default function AnalyzeClient({
   question: string;
   answer: string;
 }) {
-  const [analysis, setAnalysis] = useState<LiteAnalysisResponse | null>(null);
+  const [analysis, setAnalysis] = useState<LiteResponse | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(question && answer));
   const [error, setError] = useState<string | null>(null);
 
@@ -84,7 +85,7 @@ export default function AnalyzeClient({
           body: JSON.stringify({ question, answer }),
         });
 
-        const data = (await res.json()) as LiteAnalysisResponse;
+        const data = (await res.json()) as LiteResponse;
 
         if (cancelled) return;
 
@@ -177,11 +178,21 @@ export default function AnalyzeClient({
           )}
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm">
-          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-            Better Prompt
-          </div>
+        <SectionCard eyebrow="What’s Missing" title="Highest-Priority Issue">
+          {isLoading ? (
+            <div className="h-16 rounded-2xl bg-amber-50 animate-pulse" />
+          ) : (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
+              <p className="text-base leading-7 text-slate-900">
+                {analysis?.top_risk_hint || "No major issue surfaced."}
+              </p>
+            </div>
+          )}
+        </SectionCard>
+      </div>
 
+      <div className="grid gap-6 lg:grid-cols-2">
+        <SectionCard eyebrow="Quick Fix Prompt" title="Fast Improvement">
           {isLoading ? (
             <div className="space-y-3">
               <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
@@ -189,24 +200,51 @@ export default function AnalyzeClient({
               <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
             </div>
           ) : (
-            <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-              {analysis?.better_prompt || "No improved prompt is available yet."}
-            </p>
+            <div className="space-y-4">
+              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                {analysis?.quick_fix_prompt || "No quick fix prompt is available yet."}
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  navigator.clipboard.writeText(analysis?.quick_fix_prompt || "")
+                }
+                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Copy Prompt
+              </button>
+            </div>
           )}
-        </div>
-      </div>
+        </SectionCard>
 
-      <SectionCard eyebrow="What’s Missing" title="Highest-Priority Issue">
-        {isLoading ? (
-          <div className="h-16 rounded-2xl bg-amber-50 animate-pulse" />
-        ) : (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-4">
-            <p className="text-base leading-7 text-slate-900">
-              {analysis?.top_risk_hint || "No major issue surfaced."}
-            </p>
-          </div>
-        )}
-      </SectionCard>
+        <SectionCard eyebrow="Deep Reasoning Prompt" title="Stronger Second Pass">
+          {isLoading ? (
+            <div className="space-y-3">
+              <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
+              <div className="h-4 w-full rounded bg-slate-100 animate-pulse" />
+              <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                {analysis?.deep_reasoning_prompt ||
+                  "No deep reasoning prompt is available yet."}
+              </p>
+              <button
+                type="button"
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    analysis?.deep_reasoning_prompt || ""
+                  )
+                }
+                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Copy Prompt
+              </button>
+            </div>
+          )}
+        </SectionCard>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <SectionCard eyebrow="Original Question" title="Question">
@@ -234,25 +272,6 @@ export default function AnalyzeClient({
           </div>
         </SectionCard>
       </div>
-
-      <SectionCard eyebrow="Next Step" title="Deep Analysis">
-        <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-2xl text-sm leading-7 text-slate-700">
-            This page is intentionally fast and focused. For a full reasoning
-            audit with weak assumptions, missing risks, reasoning gaps, and
-            failure scenarios, run the deeper inspection next.
-          </p>
-
-          <a
-            href={`/analyze/deep?question=${encodeURIComponent(
-              question
-            )}&answer=${encodeURIComponent(answer)}`}
-            className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-          >
-            Run Deep Analysis
-          </a>
-        </div>
-      </SectionCard>
     </div>
   );
 }
