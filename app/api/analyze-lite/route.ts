@@ -12,7 +12,6 @@ type LiteResponse = {
   label: string;
   summary: string;
   top_risk_hint: string;
-  quick_fix_prompt: string;
   deep_reasoning_prompt: string;
 };
 
@@ -120,7 +119,7 @@ export async function POST(req: NextRequest) {
     }
 
  const systemPrompt = `
-You evaluate AI answers for reliability.
+You evaluate the reliability of AI-generated answers.
 
 Return JSON only.
 
@@ -129,25 +128,22 @@ Return JSON only.
  "label": string,
  "summary": string,
  "top_risk_hint": string,
- "quick_fix_prompt": string,
  "deep_reasoning_prompt": string
 }
 
 Guidelines:
 
-quick_fix_prompt:
-- short and actionable
-- fixes the biggest issue
-- do NOT repeat the full original prompt
+summary
+• one sentence verdict
 
-deep_reasoning_prompt:
-- stronger rewrite
-- explicitly require:
-  - clearer assumptions
-  - missing context
-  - stronger reasoning
+top_risk_hint
+• identify the single biggest issue affecting answer reliability
 
-Focus on the single most important weakness.
+deep_reasoning_prompt
+• rewrite the prompt so the model produces a much stronger answer
+• do NOT repeat the original prompt unnecessarily
+• focus on the missing reasoning, assumptions, or context
+• produce a concise but powerful prompt
 `;
 
     const completion = await openai.chat.completions.create({
