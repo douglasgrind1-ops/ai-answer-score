@@ -25,7 +25,7 @@ export default async function AnalyzePage({ searchParams }: AnalyzePageProps) {
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
             A fast analysis of the AI-generated answer, with the highest-priority
-            issues surfaced first and a stronger next-step prompt.
+            issues surfaced first and stronger prompt upgrades.
           </p>
         </div>
 
