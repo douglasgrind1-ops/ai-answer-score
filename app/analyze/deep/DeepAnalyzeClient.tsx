@@ -194,7 +194,12 @@ Improve the answer with clearer assumptions, stronger reasoning, and a more stru
     stress.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
 
   if (litePrompt) {
-    return `${litePrompt}
+    return `Provide a stronger answer to this question:
+
+${question}
+
+Base guidance:
+${litePrompt}
 
 Also improve the answer by addressing:
 - ${assumption}
@@ -331,10 +336,7 @@ export default function DeepAnalyzeClient({
         ? stress.reliability_score
         : null;
 
-  const label =
-    score !== null
-      ? lite?.label || scoreLabel(score)
-      : "Unavailable";
+  const label = score !== null ? lite?.label || scoreLabel(score) : "Unavailable";
 
   const verdict =
     lite?.summary ||
@@ -422,26 +424,34 @@ export default function DeepAnalyzeClient({
       </div>
 
       <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
-  <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
-    <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-      Improved Prompt
-    </div>
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+            Improved Prompt
+          </div>
 
-    <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
-      {deepPrompt}
-    </div>
+          {liteLoading && !lite ? (
+            <div className="mt-3 space-y-3">
+              <div className="h-4 w-4/5 rounded bg-white/70 animate-pulse" />
+              <div className="h-4 w-full rounded bg-white/70 animate-pulse" />
+              <div className="h-4 w-3/4 rounded bg-white/70 animate-pulse" />
+            </div>
+          ) : (
+            <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
+              {deepPrompt}
+            </div>
+          )}
 
-    <div className="mt-4">
-      <button
-        type="button"
-        onClick={() => navigator.clipboard.writeText(deepPrompt)}
-        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-      >
-        Copy Prompt
-      </button>
-    </div>
-  </div>
-</SectionCard>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => navigator.clipboard.writeText(deepPrompt)}
+              className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+            >
+              Copy Prompt
+            </button>
+          </div>
+        </div>
+      </SectionCard>
 
       <SectionCard eyebrow="Deep Analysis" title="Reasoning Audit">
         <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
@@ -566,21 +576,14 @@ export default function DeepAnalyzeClient({
             </p>
 
             {answer.length > 900 ? (
-              <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
-                <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-                  {deepPrompt}
+              <details className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+                  Show full answer
+                </summary>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                  {answer}
                 </p>
-
-              <div className="mt-4">
-              <button
-                type="button"
-                onClick={() => navigator.clipboard.writeText(deepPrompt)}
-                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-          >
-            Copy Prompt
-          </button>
-        </div>
-      </div>
+              </details>
             ) : null}
           </div>
         </SectionCard>
