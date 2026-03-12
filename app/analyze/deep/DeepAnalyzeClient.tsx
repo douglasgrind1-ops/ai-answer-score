@@ -173,17 +173,43 @@ function buildDeepReasoningPrompt(
   lite: LiteResponse | null,
   full: FullAnalysisResponse | null
 ) {
+  const litePrompt = lite?.deep_reasoning_prompt?.trim() || "";
   const stress = full?.stress_test;
 
-  if (stress) {
-    const assumption =
-      stress.weakest_assumptions?.[0]?.text || "unclear assumptions";
-    const risk =
-      stress.missing_risks?.[0]?.text || "missing risks or constraints";
-    const gap =
-      stress.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
+  if (!stress) {
+    if (litePrompt) return litePrompt;
 
     return `Provide a stronger answer to this question:
+
+${question}
+
+Improve the answer with clearer assumptions, stronger reasoning, and a more structured response.`;
+  }
+
+  const assumption =
+    stress.weakest_assumptions?.[0]?.text || "unclear assumptions";
+  const risk =
+    stress.missing_risks?.[0]?.text || "missing risks or constraints";
+  const gap =
+    stress.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
+
+  if (litePrompt) {
+    return `${litePrompt}
+
+Also improve the answer by addressing:
+- ${assumption}
+- ${risk}
+- ${gap}
+
+Requirements:
+• clarify assumptions
+• address missing risks
+• strengthen reasoning
+• use clear criteria and trade-offs
+• give a structured, complete answer`;
+  }
+
+  return `Provide a stronger answer to this question:
 
 ${question}
 
@@ -198,17 +224,6 @@ Requirements:
 • strengthen reasoning
 • use clear criteria and trade-offs
 • give a structured, complete answer`;
-  }
-
-  if (lite?.deep_reasoning_prompt?.trim()) {
-    return lite.deep_reasoning_prompt.trim();
-  }
-
-  return `Provide a stronger answer to this question:
-
-${question}
-
-Improve the answer with clearer assumptions, stronger reasoning, and a more structured response.`;
 }
 
 export default function DeepAnalyzeClient({
