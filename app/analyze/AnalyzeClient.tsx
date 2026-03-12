@@ -267,7 +267,7 @@ export default function AnalyzeClient({
               )}&answer=${encodeURIComponent(answer)}`}
               className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
             >
-              Run Deep Analysis
+              Open Full Audit
             </a>
           </div>
         </SectionCard>
