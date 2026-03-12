@@ -331,7 +331,6 @@ export default function DeepAnalyzeClient({
 
   const deepPrompt = useMemo(() => {
     if (!full) return "";
-
     return buildDeepReasoningPrompt(question, lite, full);
   }, [question, lite, full]);
 
@@ -342,7 +341,8 @@ export default function DeepAnalyzeClient({
         ? stress.reliability_score
         : null;
 
-  const label = score !== null ? lite?.label || scoreLabel(score) : "Unavailable";
+  const label =
+    score !== null ? lite?.label || scoreLabel(score) : "Unavailable";
 
   const verdict =
     lite?.summary ||
@@ -402,6 +402,19 @@ export default function DeepAnalyzeClient({
                 </div>
               </div>
 
+              <div className="mt-6">
+                <div className="text-sm font-medium text-slate-500">
+                  Confidence
+                </div>
+                <div className="mt-2 h-3 w-full rounded bg-slate-200">
+                  <div
+                    className="h-3 rounded bg-indigo-500 transition-all"
+                    style={{ width: `${(score || 0) * 10}%` }}
+                  />
+                </div>
+                <div className="mt-1 text-sm text-slate-600">{label}</div>
+              </div>
+
               <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
                   Verdict
@@ -414,7 +427,7 @@ export default function DeepAnalyzeClient({
           )}
         </div>
 
-        <SectionCard eyebrow="Key Reliability Risk" title="Highest-Impact Issue">
+        <SectionCard eyebrow="Primary Risk" title="Highest-Impact Issue">
           {liteLoading && !lite ? (
             <div className="h-16 rounded-2xl bg-amber-50 animate-pulse" />
           ) : (
@@ -425,42 +438,53 @@ export default function DeepAnalyzeClient({
         </SectionCard>
       </div>
 
-      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
-  <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
-    <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-      Improved Prompt
-    </div>
+      <SectionCard eyebrow="Improve the Answer" title="Improved Prompt">
+        <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+            Improved Prompt
+          </div>
 
-    {fullLoading && !full ? (
-      <div className="mt-3 space-y-3">
-        <div className="inline-flex rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-600">
-          Building improved prompt...
-        </div>
-        <div className="h-4 w-4/5 rounded bg-white/70 animate-pulse" />
-        <div className="h-4 w-full rounded bg-white/70 animate-pulse" />
-        <div className="h-4 w-3/4 rounded bg-white/70 animate-pulse" />
-      </div>
-    ) : (
-      <>
-        <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
-          {deepPrompt}
-        </div>
+          {fullLoading && !full ? (
+            <div className="mt-3 space-y-3">
+              <div className="inline-flex rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-600">
+                Building improved prompt...
+              </div>
+              <div className="h-4 w-4/5 rounded bg-white/70 animate-pulse" />
+              <div className="h-4 w-full rounded bg-white/70 animate-pulse" />
+              <div className="h-4 w-3/4 rounded bg-white/70 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
+                {deepPrompt}
+              </div>
 
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => navigator.clipboard.writeText(deepPrompt)}
-            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
-          >
-            Copy Prompt
-          </button>
-        </div>
-      </>
-    )}
-  </div>
-</SectionCard>
+              <div className="mt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(deepPrompt)}
+                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Copy Prompt
+                </button>
 
-      <SectionCard eyebrow="Deep Analysis" title="Reasoning Audit">
+                <a
+                  href={`https://chat.openai.com/?prompt=${encodeURIComponent(
+                    deepPrompt
+                  )}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                >
+                  Run Improved Prompt →
+                </a>
+              </div>
+            </>
+          )}
+        </div>
+      </SectionCard>
+
+      <SectionCard eyebrow="Audit Status" title="Reasoning Audit">
         <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
           {fullLoading
             ? "Running full audit..."
