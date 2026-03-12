@@ -173,20 +173,17 @@ function buildDeepReasoningPrompt(
   lite: LiteResponse | null,
   full: FullAnalysisResponse | null
 ) {
-  if (lite?.deep_reasoning_prompt?.trim()) {
-    return lite.deep_reasoning_prompt.trim();
-  }
-
   const stress = full?.stress_test;
 
-  const assumption =
-    stress?.weakest_assumptions?.[0]?.text || "unclear assumptions";
-  const risk =
-    stress?.missing_risks?.[0]?.text || "missing risks or constraints";
-  const gap =
-    stress?.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
+  if (stress) {
+    const assumption =
+      stress.weakest_assumptions?.[0]?.text || "unclear assumptions";
+    const risk =
+      stress.missing_risks?.[0]?.text || "missing risks or constraints";
+    const gap =
+      stress.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
 
-  return `Provide a stronger answer to this question:
+    return `Provide a stronger answer to this question:
 
 ${question}
 
@@ -199,7 +196,19 @@ Requirements:
 • clarify assumptions
 • address missing risks
 • strengthen reasoning
-• give a clear, structured answer`;
+• use clear criteria and trade-offs
+• give a structured, complete answer`;
+  }
+
+  if (lite?.deep_reasoning_prompt?.trim()) {
+    return lite.deep_reasoning_prompt.trim();
+  }
+
+  return `Provide a stronger answer to this question:
+
+${question}
+
+Improve the answer with clearer assumptions, stronger reasoning, and a more structured response.`;
 }
 
 export default function DeepAnalyzeClient({
