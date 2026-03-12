@@ -358,10 +358,6 @@ export default function DeepAnalyzeClient({
     stress?.reasoning_gaps?.[0]?.text ||
     "No dominant reliability risk was identified.";
 
-  const deepPrompt = useMemo(() => {
-    return buildDeepReasoningPrompt(question, lite, full);
-  }, [question, lite, full]);
-
   const answerPreview = useMemo(() => truncateText(answer, 900), [answer]);
 
   const showHeroLoading = liteLoading && !lite;
