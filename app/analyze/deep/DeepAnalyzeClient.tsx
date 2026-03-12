@@ -568,14 +568,21 @@ export default function DeepAnalyzeClient({
             </p>
 
             {answer.length > 900 ? (
-              <details className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <summary className="cursor-pointer text-sm font-semibold text-slate-700">
-                  Show full answer
-                </summary>
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-900">
-                  {answer}
+              <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
+                <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+                  {deepPrompt}
                 </p>
-              </details>
+
+              <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => navigator.clipboard.writeText(deepPrompt)}
+                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          >
+            Copy Prompt
+          </button>
+        </div>
+      </div>
             ) : null}
           </div>
         </SectionCard>
