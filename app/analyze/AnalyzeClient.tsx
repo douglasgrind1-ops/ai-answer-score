@@ -117,9 +117,7 @@ export default function AnalyzeClient({
       : null;
 
   const label =
-    score !== null
-      ? analysis?.label || scoreToLabel(score)
-      : "Unavailable";
+    score !== null ? analysis?.label || scoreToLabel(score) : "Unavailable";
 
   const answerPreview = useMemo(() => truncateText(answer, 700), [answer]);
 
@@ -170,6 +168,19 @@ export default function AnalyzeClient({
                   </div>
                 </div>
 
+                <div className="mt-6">
+                  <div className="text-sm font-medium text-slate-500">
+                    Confidence
+                  </div>
+                  <div className="mt-2 h-3 w-full rounded bg-slate-200">
+                    <div
+                      className="h-3 rounded bg-indigo-500 transition-all"
+                      style={{ width: `${(score || 0) * 10}%` }}
+                    />
+                  </div>
+                  <div className="mt-1 text-sm text-slate-600">{label}</div>
+                </div>
+
                 <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
                   <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
                     Verdict
@@ -184,7 +195,7 @@ export default function AnalyzeClient({
             )}
           </div>
 
-          <SectionCard eyebrow="What’s Missing" title="Highest-Priority Issue">
+          <SectionCard eyebrow="Primary Risk" title="Highest-Priority Issue">
             {isLoading ? (
               <div className="h-16 rounded-2xl bg-amber-50 animate-pulse" />
             ) : (
@@ -197,7 +208,7 @@ export default function AnalyzeClient({
           </SectionCard>
         </div>
 
-        <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
+        <SectionCard eyebrow="Improve the Answer" title="Improved Prompt">
           {isLoading ? (
             <div className="space-y-3">
               <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
@@ -205,23 +216,38 @@ export default function AnalyzeClient({
               <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
             </div>
           ) : (
-            <div className="space-y-4">
-              <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                Improved Prompt
+              </div>
+
+              <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
                 {analysis?.deep_reasoning_prompt ||
                   "No improved prompt available."}
-              </p>
+              </div>
 
-              <button
-                type="button"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    analysis?.deep_reasoning_prompt || ""
-                  )
-                }
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Copy Prompt
-              </button>
+              <div className="mt-4 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      analysis?.deep_reasoning_prompt || ""
+                    )
+                  }
+                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Copy Prompt
+                </button>
+
+                <a
+                  href={`/analyze/deep?question=${encodeURIComponent(
+                    question
+                  )}&answer=${encodeURIComponent(answer)}`}
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+                >
+                  Open Full Audit
+                </a>
+              </div>
             </div>
           )}
         </SectionCard>
@@ -252,25 +278,6 @@ export default function AnalyzeClient({
             </div>
           </SectionCard>
         </div>
-
-        <SectionCard eyebrow="Next Step" title="Deep Analysis">
-          <div className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-2xl text-sm leading-7 text-slate-700">
-              This page is intentionally fast and focused. For a full reasoning
-              audit with weak assumptions, missing risks, reasoning gaps, and
-              failure scenarios, run the deeper inspection next.
-            </p>
-
-            <a
-              href={`/analyze/deep?question=${encodeURIComponent(
-                question
-              )}&answer=${encodeURIComponent(answer)}`}
-              className="inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-            >
-              Open Full Audit
-            </a>
-          </div>
-        </SectionCard>
       </div>
     </div>
   );
