@@ -19,15 +19,15 @@ export default async function DeepAnalyzePage({
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="mb-10">
           <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-            Deep Inspection
+            Full Audit
           </div>
           <h1 className="flex items-center gap-3 text-4xl font-bold tracking-tight">
             <span>✦</span>
-            <span>AI Answer Score — Deep Analysis</span>
+            <span>AI Answer Audit</span>
           </h1>
           <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-            Full reasoning audit with assumptions, risks, reasoning gaps, failure
-            scenarios, and reconstructed claims.
+            Full reasoning audit with assumptions, risks, reasoning gaps,
+            failure scenarios, claim-level review, and a stronger improved prompt.
           </p>
         </div>
 
