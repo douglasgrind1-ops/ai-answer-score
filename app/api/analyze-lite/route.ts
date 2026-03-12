@@ -49,7 +49,18 @@ function parseJson(text: string): Partial<LiteResponse> {
 }
 
 function fallbackDeepPrompt(question: string, topRiskHint: string): string {
-  return `Answer the question again with stronger reasoning. Address this issue: ${topRiskHint} Define the criteria you are using, account for important uncertainty, and provide a more structured and complete answer to: ${question}`;
+  return `Provide a stronger answer to this question:
+
+${question}
+
+Improve the answer by specifically addressing this issue:
+${topRiskHint}
+
+Requirements:
+• clarify assumptions
+• address missing risks
+• strengthen reasoning
+• give a clear, structured answer`;
 }
 
 function sanitizeResponse(
@@ -130,9 +141,12 @@ Rules:
 - label must be short
 - summary must be one sentence
 - top_risk_hint must be short and specific
-- deep_reasoning_prompt must be more structured and should force a better second-pass answer
-- do not repeat the original question unnecessarily
-- preserve the user's original intent, but focus on what should be added or fixed
+- deep_reasoning_prompt must be a standalone reusable prompt
+- it should work even outside the current conversation
+- include the original question only as needed for clarity
+- focus on what should be added, clarified, or fixed
+- do NOT say "answer again"
+- do NOT rely on prior conversation context
 `.trim();
 
     const userPrompt = `
@@ -144,10 +158,12 @@ ${answer}
 
 Evaluate the answer quickly.
 
-Build one improved prompt:
-- deep_reasoning_prompt = structured, optimized for accuracy and completeness
+Generate one improved prompt:
 
-Focus on the single biggest weakness, but also strengthen the reasoning where needed.
+deep_reasoning_prompt
+- a self-contained prompt that will produce a stronger answer
+- it should incorporate the most important missing assumption, risk, or reasoning gap
+- it must be usable on its own without prior context
 
 Return only the JSON object.
 `.trim();
@@ -178,7 +194,7 @@ Return only the JSON object.
         summary: "The analysis service failed to respond.",
         top_risk_hint: "Unable to determine the main issue.",
         deep_reasoning_prompt:
-          "Answer the question again with stronger reasoning, clearer criteria, and a more complete explanation.",
+          "Provide a stronger answer with clearer assumptions, stronger reasoning, and a more structured response.",
       },
       { status: 500 }
     );
