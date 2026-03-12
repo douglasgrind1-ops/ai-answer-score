@@ -421,29 +421,27 @@ export default function DeepAnalyzeClient({
         </SectionCard>
       </div>
 
-      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Improved Prompt">
-        {liteLoading && !lite ? (
-          <div className="space-y-3">
-            <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
-            <div className="h-4 w-full rounded bg-slate-100 animate-pulse" />
-            <div className="h-4 w-3/4 rounded bg-slate-100 animate-pulse" />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="whitespace-pre-wrap text-sm leading-7 text-slate-900">
-              {deepPrompt}
-            </p>
+      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
+  <div className="rounded-2xl border border-indigo-200 bg-indigo-50 px-5 py-5">
+    <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+      Improved Prompt
+    </div>
 
-            <button
-              type="button"
-              onClick={() => navigator.clipboard.writeText(deepPrompt)}
-              className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            >
-              Copy Prompt
-            </button>
-          </div>
-        )}
-      </SectionCard>
+    <div className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-slate-900">
+      {deepPrompt}
+    </div>
+
+    <div className="mt-4">
+      <button
+        type="button"
+        onClick={() => navigator.clipboard.writeText(deepPrompt)}
+        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700"
+      >
+        Copy Prompt
+      </button>
+    </div>
+  </div>
+</SectionCard>
 
       <SectionCard eyebrow="Deep Analysis" title="Reasoning Audit">
         <div className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
