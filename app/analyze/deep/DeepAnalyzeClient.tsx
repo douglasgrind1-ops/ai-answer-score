@@ -421,7 +421,7 @@ export default function DeepAnalyzeClient({
         </SectionCard>
       </div>
 
-      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Prompt">
+      <SectionCard eyebrow="Improve the Answer" title="Deep Reasoning Improved Prompt">
         {liteLoading && !lite ? (
           <div className="space-y-3">
             <div className="h-4 w-4/5 rounded bg-slate-100 animate-pulse" />
