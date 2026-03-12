@@ -48,10 +48,6 @@ function parseJson(text: string): Partial<LiteResponse> {
   }
 }
 
-function fallbackQuickFixPrompt(topRiskHint: string): string {
-  return `Answer the question again, but improve the answer by addressing this issue: ${topRiskHint} Keep the response concise, clearer, and better supported.`;
-}
-
 function fallbackDeepPrompt(question: string, topRiskHint: string): string {
   return `Answer the question again with stronger reasoning. Address this issue: ${topRiskHint} Define the criteria you are using, account for important uncertainty, and provide a more structured and complete answer to: ${question}`;
 }
@@ -70,10 +66,6 @@ function sanitizeResponse(
     data.top_risk_hint,
     "Missing context or unclear assumptions."
   );
-  const quick_fix_prompt = safeString(
-    data.quick_fix_prompt,
-    fallbackQuickFixPrompt(top_risk_hint)
-  );
   const deep_reasoning_prompt = safeString(
     data.deep_reasoning_prompt,
     fallbackDeepPrompt(question, top_risk_hint)
@@ -84,7 +76,6 @@ function sanitizeResponse(
     label,
     summary,
     top_risk_hint,
-    quick_fix_prompt,
     deep_reasoning_prompt,
   };
 }
@@ -118,38 +109,53 @@ export async function POST(req: NextRequest) {
       );
     }
 
- const systemPrompt = `
+    const systemPrompt = `
 You evaluate the reliability of AI-generated answers.
 
-Return JSON only.
+Return STRICT JSON only.
+No markdown.
+No extra commentary.
 
+Return exactly this shape:
 {
- "reliability_score": number,
- "label": string,
- "summary": string,
- "top_risk_hint": string,
- "deep_reasoning_prompt": string
+  "reliability_score": 0,
+  "label": "",
+  "summary": "",
+  "top_risk_hint": "",
+  "deep_reasoning_prompt": ""
 }
 
-Guidelines:
+Rules:
+- reliability_score must be an integer from 0 to 10
+- label must be short
+- summary must be one sentence
+- top_risk_hint must be short and specific
+- deep_reasoning_prompt must be more structured and should force a better second-pass answer
+- do not repeat the original question unnecessarily
+- preserve the user's original intent, but focus on what should be added or fixed
+`.trim();
 
-summary
-• one sentence verdict
+    const userPrompt = `
+Question:
+${question}
 
-top_risk_hint
-• identify the single biggest issue affecting answer reliability
+Answer:
+${answer}
 
-deep_reasoning_prompt
-• rewrite the prompt so the model produces a much stronger answer
-• do NOT repeat the original prompt unnecessarily
-• focus on the missing reasoning, assumptions, or context
-• produce a concise but powerful prompt
-`;
+Evaluate the answer quickly.
+
+Build one improved prompt:
+- deep_reasoning_prompt = structured, optimized for accuracy and completeness
+
+Focus on the single biggest weakness, but also strengthen the reasoning where needed.
+
+Return only the JSON object.
+`.trim();
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.1,
-      max_tokens: 300,
+      max_tokens: 260,
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
@@ -171,8 +177,6 @@ deep_reasoning_prompt
         label: "Unavailable",
         summary: "The analysis service failed to respond.",
         top_risk_hint: "Unable to determine the main issue.",
-        quick_fix_prompt:
-          "Answer the question again, but make the response clearer and better supported.",
         deep_reasoning_prompt:
           "Answer the question again with stronger reasoning, clearer criteria, and a more complete explanation.",
       },
