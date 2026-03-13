@@ -545,6 +545,31 @@ export default function Home() {
                 {loading ? "Analyzing..." : "Run analysis"}
               </button>
 
+            {loading && (
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                  AI inspection in progress
+                </div>
+            
+                <div className="mt-4 space-y-3">
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
+                    Inspecting answer structure
+                  </div>
+            
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
+                    Evaluating reasoning quality
+                  </div>
+            
+                  <div className="flex items-center gap-3 text-sm text-slate-700">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
+                    Generating trust score
+                  </div>
+                </div>
+              </div>
+            )}
+              
               {error ? (
                 <p className="text-sm font-medium text-red-600">{error}</p>
               ) : null}
