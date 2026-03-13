@@ -567,8 +567,67 @@ export default function Home() {
 }
 
 function SingleAnswerView({ result }: { result: SingleResult }) {
+  const primaryRisk =
+    result.stress_test.missing_risks?.[0]?.text ||
+    result.stress_test.weakest_assumptions?.[0]?.text ||
+    result.stress_test.reasoning_gaps?.[0]?.text ||
+    "No dominant reliability risk identified.";
+
   return (
     <>
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+              ✦ AI Answer Score
+            </div>
+
+            <div className="mt-3 flex items-end gap-3">
+              <div className="text-5xl font-extrabold tracking-tight text-slate-900 md:text-6xl">
+                {result.stress_test.reliability_score}
+              </div>
+              <div className="pb-2">
+                <div className="text-lg font-semibold text-slate-500">/10</div>
+                <div className="text-sm font-semibold text-slate-600">
+                  Trust badge
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <ReliabilityGuide score={result.stress_test.reliability_score} />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                Summary
+              </div>
+              <p className="mt-2 leading-7 text-slate-700">
+                {result.stress_test.summary}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
+                Primary Risk
+              </div>
+              <p className="mt-2 leading-7 text-slate-700">{primaryRisk}</p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                Reliability Explanation
+              </div>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                {result.stress_test.reliability_explanation}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 md:grid-cols-3">
         <Card title="Summary">
           <p className="leading-7 text-slate-700">{result.stress_test.summary}</p>
@@ -631,41 +690,111 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
         />
       </section>
 
-      <details className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
-        <summary className="cursor-pointer text-lg font-semibold text-slate-900">
-          Show reasoning details
-        </summary>
+      <section className="grid gap-6 md:grid-cols-2">
+        <Card title="Supporting claims">
+          <ul className="space-y-3">
+            {result.reconstruction.supporting_claims.map((claim, index) => (
+              <li key={index} className="leading-7 text-slate-700">
+                {claim}
+              </li>
+            ))}
+          </ul>
+        </Card>
 
-        <div className="mt-5 grid gap-6 md:grid-cols-2">
-          <SimpleListCard
-            title="Supporting claims"
-            items={result.reconstruction.supporting_claims}
-          />
-          <SimpleListCard
-            title="Assumptions"
-            items={result.reconstruction.assumptions}
-          />
-          <SimpleListCard
-            title="Uncertain or context-dependent claims"
-            items={result.reconstruction.uncertain_or_context_dependent_claims}
-          />
-        </div>
-      </details>
+        <Card title="Uncertain or context-dependent claims">
+          <ul className="space-y-3">
+            {result.reconstruction.uncertain_or_context_dependent_claims.map(
+              (claim, index) => (
+                <li key={index} className="leading-7 text-slate-700">
+                  {claim}
+                </li>
+              )
+            )}
+          </ul>
+        </Card>
+      </section>
+
+      <section className="grid gap-6 md:grid-cols-2">
+        <Card title="Underlying assumptions">
+          <ul className="space-y-3">
+            {result.reconstruction.assumptions.map((assumption, index) => (
+              <li key={index} className="leading-7 text-slate-700">
+                {assumption}
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        <Card title="Recommended next question">
+          <p className="leading-7 text-slate-700">
+            {result.stress_test.best_follow_up_question}
+          </p>
+        </Card>
+      </section>
     </>
   );
 }
-
 function CompareView({ result }: { result: CompareResult }) {
   return (
     <>
+      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+              ✦ AI Answer Score Compare
+            </div>
+
+            <div className="mt-3 text-4xl font-extrabold tracking-tight text-slate-900 md:text-5xl">
+              {result.comparison.winner === "tie"
+                ? "Tie"
+                : `Winner: Answer ${result.comparison.winner}`}
+            </div>
+
+            <div className="mt-2 text-sm font-semibold text-slate-600">
+              Comparison trust summary
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                Winner rationale
+              </div>
+              <p className="mt-2 leading-7 text-slate-700">
+                {result.comparison.winner_rationale}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
+                Key reasoning difference
+              </div>
+              <p className="mt-2 leading-7 text-slate-700">
+                {result.comparison.key_reasoning_difference ||
+                  "No single dominant reasoning difference was identified."}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                Practical takeaway
+              </div>
+              <p className="mt-2 leading-7 text-slate-700">
+                {result.comparison.decision_takeaway}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white shadow-lg md:p-8">
         <h2 className="mb-3 text-xl font-semibold">Final recommendation</h2>
 
         <div className="mb-4 flex items-center gap-3">
           <span className="text-4xl font-bold">
-            Winner:{' '}
-            {result.comparison.winner === 'tie'
-              ? 'Tie'
+            Winner:{" "}
+            {result.comparison.winner === "tie"
+              ? "Tie"
               : `Answer ${result.comparison.winner}`}
           </span>
         </div>
@@ -711,77 +840,114 @@ function CompareView({ result }: { result: CompareResult }) {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        <Card title="Comparison summary">
+      <section className="grid gap-6 lg:grid-cols-2">
+        <Card title="Answer A summary">
           <p className="leading-7 text-slate-700">
-            {result.comparison.comparison_summary}
+            {result.answer_a.stress_test.summary}
+          </p>
+          <div className="mt-4">
+            <ScoreDisplay score={result.answer_a.stress_test.reliability_score} />
+          </div>
+          <p className="mt-4 text-sm text-slate-600">
+            {result.answer_a.stress_test.reliability_explanation}
           </p>
         </Card>
 
-        <Card title="Model A score">
-          <ScoreDisplay score={result.comparison.answer_a_score} />
-        </Card>
-
-        <Card title="Model B score">
-          <ScoreDisplay score={result.comparison.answer_b_score} />
+        <Card title="Answer B summary">
+          <p className="leading-7 text-slate-700">
+            {result.answer_b.stress_test.summary}
+          </p>
+          <div className="mt-4">
+            <ScoreDisplay score={result.answer_b.stress_test.reliability_score} />
+          </div>
+          <p className="mt-4 text-sm text-slate-600">
+            {result.answer_b.stress_test.reliability_explanation}
+          </p>
         </Card>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <Card title={`Model A (${result.comparison.answer_a_score}/10)`}>
-          <p className="mb-3 font-medium text-slate-900">Strengths</p>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700">
-            {result.comparison.answer_a_strengths.map((item, i) => (
-              <li key={`a-s-${i}`}>{item}</li>
-            ))}
-          </ul>
+      <section className="grid gap-6 lg:grid-cols-2">
+        <ClaimReviewCard
+          title="Answer A inspection"
+          items={result.answer_a.stress_test.claim_reviews}
+        />
+        <ClaimReviewCard
+          title="Answer B inspection"
+          items={result.answer_b.stress_test.claim_reviews}
+        />
+      </section>
 
-          <p className="mb-3 mt-5 font-medium text-slate-900">Weaknesses</p>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700">
-            {result.comparison.answer_a_weaknesses.map((item, i) => (
-              <li key={`a-w-${i}`}>{item}</li>
-            ))}
-          </ul>
+      <section className="grid gap-6 lg:grid-cols-2">
+        <WeightedListCard
+          title="Answer A weakest assumptions"
+          items={result.answer_a.stress_test.weakest_assumptions}
+        />
+        <WeightedListCard
+          title="Answer B weakest assumptions"
+          items={result.answer_b.stress_test.weakest_assumptions}
+        />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <WeightedListCard
+          title="Answer A missing risks"
+          items={result.answer_a.stress_test.missing_risks}
+        />
+        <WeightedListCard
+          title="Answer B missing risks"
+          items={result.answer_b.stress_test.missing_risks}
+        />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <WeightedListCard
+          title="Answer A reasoning gaps"
+          items={result.answer_a.stress_test.reasoning_gaps}
+        />
+        <WeightedListCard
+          title="Answer B reasoning gaps"
+          items={result.answer_b.stress_test.reasoning_gaps}
+        />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <WeightedListCard
+          title="Answer A failure scenarios"
+          items={result.answer_a.stress_test.failure_scenarios}
+        />
+        <WeightedListCard
+          title="Answer B failure scenarios"
+          items={result.answer_b.stress_test.failure_scenarios}
+        />
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <Card title="Answer A main conclusion">
+          <p className="leading-7 text-slate-700">
+            {result.answer_a.reconstruction.main_conclusion}
+          </p>
         </Card>
 
-        <Card title={`Model B (${result.comparison.answer_b_score}/10)`}>
-          <p className="mb-3 font-medium text-slate-900">Strengths</p>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700">
-            {result.comparison.answer_b_strengths.map((item, i) => (
-              <li key={`b-s-${i}`}>{item}</li>
-            ))}
-          </ul>
-
-          <p className="mb-3 mt-5 font-medium text-slate-900">Weaknesses</p>
-          <ul className="list-disc space-y-2 pl-5 text-slate-700">
-            {result.comparison.answer_b_weaknesses.map((item, i) => (
-              <li key={`b-w-${i}`}>{item}</li>
-            ))}
-          </ul>
+        <Card title="Answer B main conclusion">
+          <p className="leading-7 text-slate-700">
+            {result.answer_b.reconstruction.main_conclusion}
+          </p>
         </Card>
       </section>
 
-      <details className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
-        <summary className="cursor-pointer text-lg font-semibold text-slate-900">
-          Show detailed audits for both models
-        </summary>
+      <section className="grid gap-6 lg:grid-cols-2">
+        <Card title="Answer A alternative perspective">
+          <p className="leading-7 text-slate-700">
+            {result.answer_a.stress_test.alternative_perspective}
+          </p>
+        </Card>
 
-        <div className="mt-5 space-y-8">
-          <div>
-            <h3 className="mb-4 text-xl font-semibold text-slate-900">
-              Model A audit
-            </h3>
-            <SingleAnswerView result={result.answerA} />
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-xl font-semibold text-slate-900">
-              Model B audit
-            </h3>
-            <SingleAnswerView result={result.answerB} />
-          </div>
-        </div>
-      </details>
+        <Card title="Answer B alternative perspective">
+          <p className="leading-7 text-slate-700">
+            {result.answer_b.stress_test.alternative_perspective}
+          </p>
+        </Card>
+      </section>
     </>
   );
 }
