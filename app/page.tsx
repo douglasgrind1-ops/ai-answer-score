@@ -65,42 +65,54 @@ type CompareResult = {
 type Result = SingleResult | CompareResult;
 
 export default function Home() {
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [answerB, setAnswerB] = useState('');
-  const [mode, setMode] = useState<Mode>('blind_spots');
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [answerB, setAnswerB] = useState("");
+  const [mode, setMode] = useState<Mode>("blind_spots");
   const [compare, setCompare] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  async function analyze() {
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
     setResult(null);
 
     try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          answer,
-          answerB,
-          mode,
-          compare,
-        }),
+      const payload = compare
+        ? {
+            type: "compare",
+            mode,
+            question,
+            answer_a: answer,
+            answer_b: answerB,
+          }
+        : {
+            type: "single",
+            mode,
+            question,
+            answer,
+          };
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Something went wrong');
+      if (!response.ok) {
+        throw new Error(data?.error || "Something went wrong.");
       }
 
       setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -126,6 +138,9 @@ export default function Home() {
               <a href="#how-it-works" className="hover:text-slate-900">
                 How it works
               </a>
+              <a href="#trust-badge" className="hover:text-slate-900">
+                Trust badge
+              </a>
               <a href="#leaderboard" className="hover:text-slate-900">
                 Model snapshot
               </a>
@@ -145,7 +160,7 @@ export default function Home() {
 
         <header className="space-y-8">
           <div className="inline-flex items-center rounded-full border border-blue-300 bg-white/80 px-4 py-1.5 text-sm text-blue-700 shadow-sm backdrop-blur">
-            AI answer evaluation
+            The trust layer for AI answers
           </div>
 
           <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
@@ -157,339 +172,395 @@ export default function Home() {
                   className="h-16 w-auto md:h-20"
                 />
 
-                <h1 className="max-w-4xl text-5xl font-bold leading-[1.02] tracking-tight text-slate-950 md:text-6xl">
-                  A trust score for AI-generated answers
-                </h1>
+                <div className="space-y-4">
+                  <h1 className="max-w-4xl text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
+                    Know whether an AI answer is actually worth trusting.
+                  </h1>
 
-                <p className="text-lg font-medium text-indigo-600">
-                  ChatGPT vs Claude vs Gemini — which answer should you trust?
-                </p>
-
-                <p className="max-w-3xl text-xl leading-relaxed text-slate-600">
-                  Evaluate how reliable AI responses are, inspect the reasoning
-                  behind them, and compare answers across models before you trust
-                  the output.
-                </p>
-
-                <p className="max-w-2xl text-sm text-slate-500">
-                  Analyze responses from ChatGPT, Claude, Gemini, Perplexity,
-                  and other AI systems to see which answer is strongest — and
-                  why.
-                </p>
-
-                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-slate-500">
-                  <span className="text-slate-400">Works with</span>
-                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
-                    ChatGPT
-                  </span>
-                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
-                    Claude
-                  </span>
-                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
-                    Gemini
-                  </span>
-                  <span className="rounded-md border border-slate-200 bg-white px-2 py-1 shadow-sm">
-                    Perplexity
-                  </span>
+                  <p className="max-w-3xl text-lg leading-8 text-slate-700 md:text-xl">
+                    AI Answer Score inspects reasoning quality, surfaces the
+                    primary risk, and gives you a stronger follow-up prompt so
+                    you can improve weak answers instead of guessing.
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <a
                   href="#live-demo"
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
+                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-500"
                 >
                   Try the live demo
                 </a>
 
                 <a
                   href="#how-it-works"
-                  className="rounded-xl border border-slate-300 bg-white/80 px-5 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-white"
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
                   See how it works
                 </a>
               </div>
 
-              <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-sm backdrop-blur w-fit">
-                <div className="text-3xl font-bold text-indigo-600">7.2</div>
-                <div className="text-sm text-slate-600">
-                  <div className="font-semibold text-slate-900">
-                    AI Answer Score
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                    Score
                   </div>
-                  Moderately reliable
+                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                    Quantifies answer reliability on a simple 0–10 scale.
+                  </p>
                 </div>
-              </div>
 
-              <div className="pt-1">
-                <img
-                  src="/assets/logo/ai-answer-score-badge.svg"
-                  alt="AI Answer Score badge"
-                  className="h-14 w-auto"
-                />
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-600">
+                    Primary Risk
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                    Identifies the highest-impact weakness immediately.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">
+                    Better Prompt
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                    Turns critique into a stronger next-pass instruction.
+                  </p>
+                </div>
               </div>
             </div>
 
-            <section className="rounded-3xl border border-blue-200 bg-white/85 p-6 shadow-lg backdrop-blur">
-              <div className="flex items-start justify-between gap-4">
+            <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60">
+              <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">
-                    Example result
-                  </p>
-                  <h2 className="mt-1 text-lg font-semibold text-slate-900">
-                    AI Answer Score
-                  </h2>
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                    Trust Badge Preview
+                  </div>
+                  <div className="mt-1 text-sm font-semibold text-slate-600">
+                    What users see at a glance
+                  </div>
+                </div>
+                <div className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-700">
+                  Live concept
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                  ✦ AI Answer Score
+                </div>
+                <div className="mt-3 text-4xl font-extrabold tracking-tight text-indigo-600">
+                  7.8 / 10
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-600">
+                  Moderately Reliable
                 </div>
 
-                <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                  Moderately reliable
-                </span>
+                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
+                    Primary Risk
+                  </div>
+                  <p className="mt-1 text-sm leading-6 text-slate-700">
+                    Missing constraints and weak assumptions reduce practical
+                    reliability.
+                  </p>
+                </div>
+
+                <div className="mt-4 text-sm font-semibold text-indigo-600">
+                  Analyze reasoning →
+                </div>
               </div>
 
-              <div className="mt-5 flex items-end gap-2">
-                <span className="text-6xl font-bold leading-none text-slate-950">
-                  7.2
-                </span>
-                <span className="pb-2 text-xl font-medium text-slate-500">
-                  / 10
-                </span>
-              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                    Fast view
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                    Score, verdict, and top risk in seconds.
+                  </p>
+                </div>
 
-              <p className="mt-4 text-sm leading-6 text-slate-600">
-                Strong core recommendation, but missing context and weak
-                assumptions reduce confidence.
-              </p>
-
-              <div className="mt-6 space-y-3">
-                <DemoIssue
-                  label="Top concern"
-                  text="Overgeneralized recommendation without enough domain context."
-                />
-                <DemoIssue
-                  label="Reasoning gap"
-                  text="Fails to address when the opposite strategy may be better."
-                />
-                <DemoIssue
-                  label="Best use"
-                  text="Useful as a starting point, but worth checking before acting."
-                />
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                    Deep audit
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">
+                    Full reasoning inspection and a stronger improved prompt.
+                  </p>
+                </div>
               </div>
-            </section>
+            </div>
           </section>
         </header>
 
-        <section className="rounded-3xl border border-slate-200 bg-white/75 p-5 shadow-sm backdrop-blur">
-          <div className="grid gap-3 md:grid-cols-4">
-            <TrustPill text="Founders" />
-            <TrustPill text="Analysts" />
-            <TrustPill text="Researchers" />
-            <TrustPill text="Writers" />
+        <section
+          id="trust-badge"
+          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+        >
+          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
+            Trust Badge
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+            AI Answer Score Trust Badge
+          </h2>
+          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
+            A verification-style badge for AI-generated answers. Show reliability,
+            primary risk, and reasoning quality in a format users instantly
+            understand.
+          </p>
+
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                Example Badge
+              </div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                  ✦ AI Answer Score
+                </div>
+                <div className="mt-2 text-3xl font-extrabold text-indigo-600">
+                  7.8 / 10
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-600">
+                  Moderately Reliable
+                </div>
+                <div className="mt-3 text-sm font-medium text-amber-700">
+                  Primary Risk: Missing constraints
+                </div>
+                <div className="mt-3 text-sm font-semibold text-indigo-600">
+                  Analyze reasoning →
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+                Why it matters
+              </div>
+              <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                <li>Gives AI answers a visible trust layer.</li>
+                <li>Shows users the primary risk immediately.</li>
+                <li>Links directly into a full reasoning audit.</li>
+                <li>
+                  Can evolve into an embeddable badge for publishers and AI apps.
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
-        <section className="space-y-5">
-          <SectionIntro
-            eyebrow="Why it matters"
-            title="Not all AI answers are equally reliable"
-            description="Different AI models often produce very different answers to the same question. AI Answer Score helps you evaluate which responses are trustworthy — and where reasoning may break down."
-          />
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <FeatureCard
-              title="Score answer reliability"
-              description="Instantly see whether an AI response is strong, weak, or highly context-dependent."
-              className="border-blue-200 bg-blue-100/70"
-            />
-            <FeatureCard
-              title="Inspect the reasoning"
-              description="Reveal hidden assumptions, missing risks, and logical gaps in the model’s reasoning."
-              className="border-indigo-200 bg-indigo-100/70"
-            />
-            <FeatureCard
-              title="Compare AI models"
-              description="See which model answered best when multiple AIs respond to the same question."
-              className="border-cyan-200 bg-cyan-100/70"
-            />
+        <section
+          id="how-it-works"
+          className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-3"
+        >
+          <div className="space-y-3">
+            <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
+              1. Inspect
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Score the answer
+            </h3>
+            <p className="text-sm leading-7 text-slate-700">
+              Evaluate one answer or compare two answers side by side.
+            </p>
           </div>
-        </section>
 
-        <section id="how-it-works" className="space-y-5">
-          <SectionIntro
-            eyebrow="How it works"
-            title="From AI answers to a trust score"
-            description="Paste a question and answers from one or more AI models. AI Answer Score evaluates reliability, highlights reasoning gaps, and shows which model performs best."
-          />
+          <div className="space-y-3">
+            <div className="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
+              2. Diagnose
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Surface the main risk
+            </h3>
+            <p className="text-sm leading-7 text-slate-700">
+              Identify weak assumptions, missing risks, reasoning gaps, and
+              failure scenarios.
+            </p>
+          </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <StepCard
-              step="01"
-              title="Paste the question and AI answer"
-              description="Use responses from ChatGPT, Claude, Gemini, or any other AI model."
-            />
-            <StepCard
-              step="02"
-              title="Get an instant trust score"
-              description="AI Answer Score analyzes the reasoning and assigns a reliability score."
-            />
-            <StepCard
-              step="03"
-              title="Compare across AI models"
-              description="See which model produced the strongest answer and understand why it scored higher."
-            />
+          <div className="space-y-3">
+            <div className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
+              3. Improve
+            </div>
+            <h3 className="text-xl font-bold text-slate-900">
+              Generate a stronger prompt
+            </h3>
+            <p className="text-sm leading-7 text-slate-700">
+              Turn critique into a better next-pass prompt you can copy, rerun,
+              or use directly in ChatGPT.
+            </p>
           </div>
         </section>
 
         <section
           id="leaderboard"
-          className="space-y-5 rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-sm backdrop-blur md:p-7"
+          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <SectionIntro
-            eyebrow="Model snapshot"
-            title="How leading AI models compare"
-            description="Use AI Answer Score to evaluate responses side by side and understand which model is strongest for a specific question."
-          />
+          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
+            Model snapshot
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+            Compare reasoning quality across answers
+          </h2>
+          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
+            AI Answer Score helps you see not just which answer is better, but
+            why.
+          </p>
 
-          <div className="grid gap-4 md:grid-cols-4">
-            <LeaderboardCard
-              rank="01"
-              model="Claude"
-              score="8.4"
-              note="Strong reasoning, fewer unsupported jumps."
-              accent="border-green-200 bg-green-50"
-            />
-            <LeaderboardCard
-              rank="02"
-              model="ChatGPT"
-              score="7.8"
-              note="Useful answer, but some conclusions need more support."
-              accent="border-blue-200 bg-blue-50"
-            />
-            <LeaderboardCard
-              rank="03"
-              model="Gemini"
-              score="6.9"
-              note="Helpful overall, but weaker nuance in edge cases."
-              accent="border-amber-200 bg-amber-50"
-            />
-            <LeaderboardCard
-              rank="04"
-              model="Perplexity"
-              score="6.4"
-              note="Good synthesis, but sometimes more context-dependent."
-              accent="border-slate-200 bg-slate-50"
-            />
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="text-sm font-semibold text-slate-600">ChatGPT</div>
+              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
+                7.8
+              </div>
+              <div className="mt-1 text-sm text-slate-500">Reliable but incomplete</div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="text-sm font-semibold text-slate-600">Claude</div>
+              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
+                8.6
+              </div>
+              <div className="mt-1 text-sm text-slate-500">Stronger nuance and structure</div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="text-sm font-semibold text-slate-600">Gemini</div>
+              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
+                6.9
+              </div>
+              <div className="mt-1 text-sm text-slate-500">Useful but weaker reasoning</div>
+            </div>
           </div>
         </section>
 
         <section
           id="live-demo"
-          className="space-y-6 rounded-[2rem] border border-slate-200 bg-white/80 p-5 shadow-sm backdrop-blur md:p-7"
+          className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
         >
-          <SectionIntro
-            eyebrow="Try the live demo"
-            title="Evaluate AI answers instantly"
-            description="Paste a question and answers from one or more AI models to see which response is most reliable."
-          />
-
-          <section className="space-y-6 rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
-            <div className="flex items-center gap-3">
-              <input
-                id="compare-mode"
-                type="checkbox"
-                checked={compare}
-                onChange={(e) => setCompare(e.target.checked)}
-                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="compare-mode"
-                className="text-base font-medium text-slate-800"
-              >
-                Compare AI models
-              </label>
+          <div className="mb-6 space-y-3">
+            <div className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
+              Live demo
             </div>
-
-            <ModeSelector mode={mode} setMode={setMode} />
-
-            <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-              {getModeDescription(mode)}
-            </div>
-          </section>
-
-          <section
-            className={`grid gap-6 ${
-              compare ? 'md:grid-cols-3' : 'md:grid-cols-2'
-            }`}
-          >
-            <Card title="Original question">
-              <textarea
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Paste the original user question here..."
-                className="h-56 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </Card>
-
-            <Card title={compare ? 'Primary AI model answer' : 'AI model answer'}>
-              <textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder={
-                  compare
-                    ? 'Paste the first model answer here (for example ChatGPT)...'
-                    : 'Paste the AI model response here...'
-                }
-                className="h-56 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 outline-none focus:ring-2 focus:ring-blue-200"
-              />
-            </Card>
-
-            {compare && (
-              <Card title="Comparison AI model answer">
-                <textarea
-                  value={answerB}
-                  onChange={(e) => setAnswerB(e.target.value)}
-                  placeholder="Paste the second model answer here (for example Claude or Gemini)..."
-                  className="h-56 w-full resize-none rounded-2xl border border-slate-300 bg-white p-4 outline-none focus:ring-2 focus:ring-blue-200"
-                />
-              </Card>
-            )}
-          </section>
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={analyze}
-              disabled={
-                loading ||
-                !question.trim() ||
-                !answer.trim() ||
-                (compare && !answerB.trim())
-              }
-              className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50"
-            >
-              {loading
-                ? 'Analyzing...'
-                : compare
-                ? 'Compare AI models'
-                : 'Analyze answer'}
-            </button>
-
-            {error && <p className="text-red-600">{error}</p>}
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              Score an answer right now
+            </h2>
+            <p className="max-w-3xl text-lg leading-8 text-slate-600">
+              Paste a question and one or two answers to see where reasoning is
+              strong, where it breaks down, and how to improve it.
+            </p>
           </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setCompare(false)}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  !compare
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                Single answer
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setCompare(true)}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                  compare
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                Compare two answers
+              </button>
+            </div>
+
+            <div className="grid gap-6">
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Question
+                </label>
+                <textarea
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Paste the user question here..."
+                  className="min-h-[110px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  {compare ? "Answer A" : "Answer"}
+                </label>
+                <textarea
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  placeholder="Paste the first answer here..."
+                  className="min-h-[180px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+                />
+              </div>
+
+              {compare && (
+                <div>
+                  <label className="mb-2 block text-sm font-semibold text-slate-700">
+                    Answer B
+                  </label>
+                  <textarea
+                    value={answerB}
+                    onChange={(e) => setAnswerB(e.target.value)}
+                    placeholder="Paste the second answer here..."
+                    className="min-h-[180px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-700">
+                  Analysis mode
+                </label>
+                <select
+                  value={mode}
+                  onChange={(e) => setMode(e.target.value as Mode)}
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+                >
+                  <option value="blind_spots">Blind spots</option>
+                  <option value="reasoning">Reasoning</option>
+                  <option value="accuracy">Accuracy</option>
+                  <option value="decision_quality">Decision quality</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? "Analyzing..." : "Run analysis"}
+              </button>
+
+              {error ? (
+                <p className="text-sm font-medium text-red-600">{error}</p>
+              ) : null}
+            </div>
+          </form>
         </section>
 
-        {result?.type === 'single' && <SingleAnswerView result={result} />}
-        {result?.type === 'compare' && <CompareView result={result} />}
-
-        <footer className="space-y-2 pb-4 pt-2 text-center">
-          <div className="flex justify-center">
-            <img
-              src="/assets/logo/ai-answer-score-horizontal.svg"
-              alt="AI Answer Score"
-              className="h-10 w-auto"
-            />
-          </div>
-          <p className="text-sm text-slate-500">
-            Compare AI answers. Understand the reasoning. Trust the result.
-          </p>
-        </footer>
+        {result ? (
+          <section className="space-y-6">
+            {"comparison" in result ? (
+              <CompareView result={result} />
+            ) : (
+              <SingleAnswerView result={result} />
+            )}
+          </section>
+        ) : null}
       </div>
     </main>
   );
