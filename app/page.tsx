@@ -846,7 +846,7 @@ function CompareView({ result }: { result: CompareResult }) {
             {result.answerA.stress_test.summary}
           </p>
           <div className="mt-4">
-            <ScoreDisplay score={result.answer_a.stress_test.reliability_score} />
+            <ScoreDisplay score={result.answerA.stress_test.reliability_score} />
           </div>
           <p className="mt-4 text-sm text-slate-600">
             {result.answerA.stress_test.reliability_explanation}
@@ -858,7 +858,7 @@ function CompareView({ result }: { result: CompareResult }) {
             {result.answerB.stress_test.summary}
           </p>
           <div className="mt-4">
-            <ScoreDisplay score={result.answer_b.stress_test.reliability_score} />
+            <ScoreDisplay score={result.answerB.stress_test.reliability_score} />
           </div>
           <p className="mt-4 text-sm text-slate-600">
             {result.answerB.stress_test.reliability_explanation}
