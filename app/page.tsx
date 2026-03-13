@@ -1293,31 +1293,84 @@ function SeverityBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
 }
 
 function ReliabilityGuide({ score }: { score: number }) {
-  let label = 'Mixed';
-  let description =
-    'Some parts may be useful, but the answer likely has important gaps or weak assumptions.';
+  const items = [
+    {
+      label: "9–10",
+      title: "Highly reliable",
+      description:
+        "Strong reasoning, good structure, and relatively few obvious weaknesses.",
+      active: score >= 9,
+    },
+    {
+      label: "7–8",
+      title: "Strong",
+      description:
+        "Useful and mostly dependable, but may still miss nuance or constraints.",
+      active: score >= 7 && score < 9,
+    },
+    {
+      label: "5–6",
+      title: "Moderately reliable",
+      description:
+        "Directionally helpful, though important gaps or assumptions may remain.",
+      active: score >= 5 && score < 7,
+    },
+    {
+      label: "3–4",
+      title: "Use caution",
+      description:
+        "Noticeable reasoning weaknesses or missing risks reduce trustworthiness.",
+      active: score >= 3 && score < 5,
+    },
+    {
+      label: "0–2",
+      title: "Low reliability",
+      description:
+        "Weak reasoning or major omissions make the answer hard to trust.",
+      active: score < 3,
+    },
+  ];
 
-  if (score <= 3) {
-    label = 'Low reliability';
-    description =
-      'The answer likely has major weaknesses, missing context, or unsupported conclusions.';
-  } else if (score <= 5) {
-    label = 'Caution';
-    description =
-      'The answer may be directionally useful, but important risks or missing considerations reduce trust.';
-  } else if (score <= 7) {
-    label = 'Moderate reliability';
-    description =
-      'The answer is reasonably useful, but still has caveats worth checking before acting on it.';
-  } else if (score <= 8) {
-    label = 'Strong';
-    description =
-      'The answer appears fairly solid, though it may still benefit from validation or added context.';
-  } else {
-    label = 'Very strong';
-    description =
-      'The answer appears well-reasoned and reliable, with relatively minor weaknesses.';
-  }
+  return (
+    <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+        Reliability Guide
+      </div>
+
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className={`rounded-2xl border px-4 py-3 transition ${
+              item.active
+                ? "border-indigo-200 bg-indigo-50"
+                : "border-slate-200 bg-slate-50"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-bold text-slate-900">
+                {item.title}
+              </div>
+              <div
+                className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                  item.active
+                    ? "bg-indigo-100 text-indigo-700"
+                    : "bg-white text-slate-500"
+                }`}
+              >
+                {item.label}
+              </div>
+            </div>
+
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              {item.description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
@@ -1328,19 +1381,59 @@ function ReliabilityGuide({ score }: { score: number }) {
 }
 
 function ScoreDisplay({ score }: { score: number }) {
-  const color =
-    score >= 8
-      ? 'border-green-100 bg-green-50 text-green-700'
-      : score >= 5
-      ? 'border-blue-100 bg-blue-50 text-blue-700'
-      : 'border-red-100 bg-red-50 text-red-700';
+  const colorClass =
+    score >= 9
+      ? "text-green-600"
+      : score >= 7
+        ? "text-indigo-600"
+        : score >= 5
+          ? "text-amber-500"
+          : "text-red-500";
+
+  const bgClass =
+    score >= 9
+      ? "from-green-50 to-emerald-50 border-green-200"
+      : score >= 7
+        ? "from-indigo-50 to-blue-50 border-indigo-200"
+        : score >= 5
+          ? "from-amber-50 to-yellow-50 border-amber-200"
+          : "from-red-50 to-rose-50 border-red-200";
+
+  const label =
+    score >= 9
+      ? "Highly reliable"
+      : score >= 7
+        ? "Strong"
+        : score >= 5
+          ? "Moderately reliable"
+          : score >= 3
+            ? "Use caution"
+            : "Low reliability";
 
   return (
     <div
-      className={`inline-flex items-end gap-2 rounded-2xl border px-4 py-3 ${color}`}
+      className={`rounded-3xl border bg-gradient-to-br ${bgClass} p-5 shadow-sm`}
     >
-      <span className="text-5xl font-bold leading-none">{score}</span>
-      <span className="pb-1 text-lg font-medium">/10</span>
+      <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+        ✦ AI Answer Score
+      </div>
+
+      <div className="mt-3 flex items-end gap-3">
+        <div className={`text-5xl font-extrabold tracking-tight ${colorClass}`}>
+          {score}
+        </div>
+        <div className="pb-2">
+          <div className="text-lg font-semibold text-slate-500">/10</div>
+          <div className="text-sm font-semibold text-slate-600">{label}</div>
+        </div>
+      </div>
+
+      <div className="mt-4 h-3 w-full rounded-full bg-white/80">
+        <div
+          className={`h-3 rounded-full ${colorClass.replace("text-", "bg-")} transition-all`}
+          style={{ width: `${Math.max(0, Math.min(100, score * 10))}%` }}
+        />
+      </div>
     </div>
   );
 }
