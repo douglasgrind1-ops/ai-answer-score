@@ -1372,14 +1372,6 @@ function ReliabilityGuide({ score }: { score: number }) {
   );
 }
 
-  return (
-    <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4">
-      <p className="text-sm font-semibold text-blue-900">{label}</p>
-      <p className="mt-1 text-sm leading-6 text-blue-800">{description}</p>
-    </div>
-  );
-}
-
 function ScoreDisplay({ score }: { score: number }) {
   const colorClass =
     score >= 9
