@@ -53,12 +53,12 @@ type CompareResult = {
     when_other_is_better: string;
     decision_takeaway: string;
     comparison_summary: string;
-    answer_a_score: number;
-    answer_b_score: number;
-    answer_a_strengths: string[];
-    answer_b_strengths: string[];
-    answer_a_weaknesses: string[];
-    answer_b_weaknesses: string[];
+    answerA_score: number;
+    answerB_score: number;
+    answerA_strengths: string[];
+    answerB_strengths: string[];
+    answerA_weaknesses: string[];
+    answerB_weaknesses: string[];
   };
 };
 
@@ -86,8 +86,8 @@ export default function Home() {
             type: "compare",
             mode,
             question,
-            answer_a: answer,
-            answer_b: answerB,
+            answerA: answer,
+            answerB: answerB,
           }
         : {
             type: "single",
