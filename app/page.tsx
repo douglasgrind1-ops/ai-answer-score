@@ -843,25 +843,25 @@ function CompareView({ result }: { result: CompareResult }) {
       <section className="grid gap-6 lg:grid-cols-2">
         <Card title="Answer A summary">
           <p className="leading-7 text-slate-700">
-            {result.answer_a.stress_test.summary}
+            {result.answerA.stress_test.summary}
           </p>
           <div className="mt-4">
             <ScoreDisplay score={result.answer_a.stress_test.reliability_score} />
           </div>
           <p className="mt-4 text-sm text-slate-600">
-            {result.answer_a.stress_test.reliability_explanation}
+            {result.answerA.stress_test.reliability_explanation}
           </p>
         </Card>
 
         <Card title="Answer B summary">
           <p className="leading-7 text-slate-700">
-            {result.answer_b.stress_test.summary}
+            {result.answerB.stress_test.summary}
           </p>
           <div className="mt-4">
             <ScoreDisplay score={result.answer_b.stress_test.reliability_score} />
           </div>
           <p className="mt-4 text-sm text-slate-600">
-            {result.answer_b.stress_test.reliability_explanation}
+            {result.answerB.stress_test.reliability_explanation}
           </p>
         </Card>
       </section>
@@ -869,68 +869,68 @@ function CompareView({ result }: { result: CompareResult }) {
       <section className="grid gap-6 lg:grid-cols-2">
         <ClaimReviewCard
           title="Answer A inspection"
-          items={result.answer_a.stress_test.claim_reviews}
+          items={result.answerA.stress_test.claim_reviews}
         />
         <ClaimReviewCard
           title="Answer B inspection"
-          items={result.answer_b.stress_test.claim_reviews}
+          items={result.answerB.stress_test.claim_reviews}
         />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <WeightedListCard
           title="Answer A weakest assumptions"
-          items={result.answer_a.stress_test.weakest_assumptions}
+          items={result.answerA.stress_test.weakest_assumptions}
         />
         <WeightedListCard
           title="Answer B weakest assumptions"
-          items={result.answer_b.stress_test.weakest_assumptions}
+          items={result.answerB.stress_test.weakest_assumptions}
         />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <WeightedListCard
           title="Answer A missing risks"
-          items={result.answer_a.stress_test.missing_risks}
+          items={result.answerA.stress_test.missing_risks}
         />
         <WeightedListCard
           title="Answer B missing risks"
-          items={result.answer_b.stress_test.missing_risks}
+          items={result.answerB.stress_test.missing_risks}
         />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <WeightedListCard
           title="Answer A reasoning gaps"
-          items={result.answer_a.stress_test.reasoning_gaps}
+          items={result.answerA.stress_test.reasoning_gaps}
         />
         <WeightedListCard
           title="Answer B reasoning gaps"
-          items={result.answer_b.stress_test.reasoning_gaps}
+          items={result.answerB.stress_test.reasoning_gaps}
         />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <WeightedListCard
           title="Answer A failure scenarios"
-          items={result.answer_a.stress_test.failure_scenarios}
+          items={result.answerA.stress_test.failure_scenarios}
         />
         <WeightedListCard
           title="Answer B failure scenarios"
-          items={result.answer_b.stress_test.failure_scenarios}
+          items={result.answerB.stress_test.failure_scenarios}
         />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
         <Card title="Answer A main conclusion">
           <p className="leading-7 text-slate-700">
-            {result.answer_a.reconstruction.main_conclusion}
+            {result.answerA.reconstruction.main_conclusion}
           </p>
         </Card>
 
         <Card title="Answer B main conclusion">
           <p className="leading-7 text-slate-700">
-            {result.answer_b.reconstruction.main_conclusion}
+            {result.answerB.reconstruction.main_conclusion}
           </p>
         </Card>
       </section>
@@ -938,13 +938,13 @@ function CompareView({ result }: { result: CompareResult }) {
       <section className="grid gap-6 lg:grid-cols-2">
         <Card title="Answer A alternative perspective">
           <p className="leading-7 text-slate-700">
-            {result.answer_a.stress_test.alternative_perspective}
+            {result.answerA.stress_test.alternative_perspective}
           </p>
         </Card>
 
         <Card title="Answer B alternative perspective">
           <p className="leading-7 text-slate-700">
-            {result.answer_b.stress_test.alternative_perspective}
+            {result.answerB.stress_test.alternative_perspective}
           </p>
         </Card>
       </section>
