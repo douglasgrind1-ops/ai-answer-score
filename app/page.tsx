@@ -1390,6 +1390,15 @@ function ScoreDisplay({ score }: { score: number }) {
           ? "text-amber-500"
           : "text-red-500";
 
+  const barClass =
+    score >= 9
+      ? "bg-green-600"
+      : score >= 7
+        ? "bg-indigo-600"
+        : score >= 5
+          ? "bg-amber-500"
+          : "bg-red-500";
+
   const bgClass =
     score >= 9
       ? "from-green-50 to-emerald-50 border-green-200"
@@ -1430,7 +1439,7 @@ function ScoreDisplay({ score }: { score: number }) {
 
       <div className="mt-4 h-3 w-full rounded-full bg-white/80">
         <div
-          className={`h-3 rounded-full ${colorClass.replace("text-", "bg-")} transition-all`}
+          className={`h-3 rounded-full ${barClass} transition-all`}
           style={{ width: `${Math.max(0, Math.min(100, score * 10))}%` }}
         />
       </div>
