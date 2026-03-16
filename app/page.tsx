@@ -614,6 +614,34 @@ export default function Home() {
   );
 }
 
+function buildImprovedPromptFromQuestion(
+  question: string,
+  result: SingleResult
+) {
+  const assumption =
+    result.stress_test.weakest_assumptions?.[0]?.text || "unclear assumptions";
+  const risk =
+    result.stress_test.missing_risks?.[0]?.text || "missing risks or constraints";
+  const gap =
+    result.stress_test.reasoning_gaps?.[0]?.text || "insufficient reasoning depth";
+
+  return `Provide a stronger answer to this question:
+
+${question}
+
+Improve the answer by addressing:
+- ${assumption}
+- ${risk}
+- ${gap}
+
+Requirements:
+• clarify assumptions
+• address missing risks
+• strengthen reasoning
+• use clear criteria and trade-offs
+• give a structured, complete answer`;
+}
+
 function SingleAnswerView({ result }: { result: SingleResult }) {
   const primaryRisk =
     result.stress_test.missing_risks?.[0]?.text ||
