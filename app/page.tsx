@@ -1,19 +1,20 @@
 "use client";
 
-import { FormEvent, ReactNode, useState } from "react";
+import { useState } from "react";
 
 type Mode = "blind_spots" | "reasoning" | "accuracy" | "decision_quality";
+type Level = "high" | "medium" | "low";
 
 type WeightedItem = {
   text: string;
-  level?: "high" | "medium" | "low";
-  impact?: "high" | "medium" | "low";
+  impact?: Level;
+  weight?: number;
 };
 
 type ClaimReview = {
   claim: string;
   concern: string;
-  severity?: "high" | "medium" | "low";
+  severity?: Level;
 };
 
 type Reconstruction = {
@@ -24,8 +25,8 @@ type Reconstruction = {
 };
 
 type StressTest = {
-  reliability_score: number;
   summary: string;
+  reliability_score: number;
   reliability_explanation: string;
   best_follow_up_question: string;
   alternative_perspective: string;
@@ -41,24 +42,75 @@ type SingleResult = {
   stress_test: StressTest;
 };
 
-type Comparison = {
-  winner: "A" | "B" | "tie";
-  winner_rationale: string;
-  key_reasoning_difference?: string;
-  score_rationale?: string;
-  when_other_is_better: string;
-  decision_takeaway: string;
-};
-
 type CompareResult = {
+  comparison: {
+    winner: "A" | "B" | "tie" | string;
+    winner_rationale: string;
+    key_reasoning_difference?: string;
+    score_rationale?: string;
+    when_other_is_better: string;
+    decision_takeaway: string;
+  };
   answerA: SingleResult;
   answerB: SingleResult;
-  comparison: Comparison;
 };
 
 type Result = SingleResult | CompareResult;
 
-const CHROME_WEB_STORE_URL = "YOUR_CHROME_WEB_STORE_URL";
+function isCompareResult(result: Result): result is CompareResult {
+  return "comparison" in result;
+}
+
+function normalizeSingleResult(raw: any): SingleResult {
+  return {
+    reconstruction: {
+      main_conclusion: raw?.reconstruction?.main_conclusion || "No main conclusion provided.",
+      supporting_claims: raw?.reconstruction?.supporting_claims || [],
+      assumptions: raw?.reconstruction?.assumptions || [],
+      uncertain_or_context_dependent_claims:
+        raw?.reconstruction?.uncertain_or_context_dependent_claims || [],
+    },
+    stress_test: {
+      summary: raw?.stress_test?.summary || "No summary provided.",
+      reliability_score: Number(raw?.stress_test?.reliability_score ?? 0),
+      reliability_explanation:
+        raw?.stress_test?.reliability_explanation || "No reliability explanation provided.",
+      best_follow_up_question:
+        raw?.stress_test?.best_follow_up_question || "No follow-up question provided.",
+      alternative_perspective:
+        raw?.stress_test?.alternative_perspective || "No alternative perspective provided.",
+      weakest_assumptions: raw?.stress_test?.weakest_assumptions || [],
+      missing_risks: raw?.stress_test?.missing_risks || [],
+      reasoning_gaps: raw?.stress_test?.reasoning_gaps || [],
+      failure_scenarios: raw?.stress_test?.failure_scenarios || [],
+      claim_reviews: raw?.stress_test?.claim_reviews || [],
+    },
+  };
+}
+
+function normalizeResult(raw: any): Result {
+  if (raw?.comparison) {
+    const answerA = normalizeSingleResult(raw.answerA || raw.answer_a || {});
+    const answerB = normalizeSingleResult(raw.answerB || raw.answer_b || {});
+
+    return {
+      comparison: {
+        winner: raw.comparison?.winner || "tie",
+        winner_rationale: raw.comparison?.winner_rationale || "No winner rationale provided.",
+        key_reasoning_difference: raw.comparison?.key_reasoning_difference || "",
+        score_rationale: raw.comparison?.score_rationale || "",
+        when_other_is_better:
+          raw.comparison?.when_other_is_better || "No alternate-use case provided.",
+        decision_takeaway:
+          raw.comparison?.decision_takeaway || "No practical takeaway provided.",
+      },
+      answerA,
+      answerB,
+    };
+  }
+
+  return normalizeSingleResult(raw);
+}
 
 export default function Home() {
   const [question, setQuestion] = useState("");
@@ -70,7 +122,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -106,16 +158,7 @@ export default function Home() {
         throw new Error(data?.error || "Something went wrong.");
       }
 
-      const normalized =
-        "answer_a" in data || "answer_b" in data
-          ? {
-              ...data,
-              answerA: data.answerA || data.answer_a,
-              answerB: data.answerB || data.answer_b,
-            }
-          : data;
-
-      setResult(normalized);
+      setResult(normalizeResult(data));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -146,18 +189,19 @@ export default function Home() {
               <a href="#trust-badge" className="hover:text-slate-900">
                 Trust badge
               </a>
-              <a href="#model-snapshot" className="hover:text-slate-900">
+              <a href="#leaderboard" className="hover:text-slate-900">
                 Model snapshot
               </a>
               <a href="#live-demo" className="hover:text-slate-900">
                 Live demo
               </a>
+              <a href="#install-extension" className="hover:text-slate-900">
+                Add to Chrome
+              </a>
             </div>
 
             <a
-              href={CHROME_WEB_STORE_URL}
-              target="_blank"
-              rel="noreferrer"
+              href="#install-extension"
               className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
             >
               Add to Chrome
@@ -201,29 +245,27 @@ export default function Home() {
                 </a>
 
                 <a
-                  href={CHROME_WEB_STORE_URL}
-                  target="_blank"
-                  rel="noreferrer"
+                  href="#how-it-works"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
-                  Add to Chrome
+                  See how it works
                 </a>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 <FeatureCard
-                  title="Score"
-                  accent="text-indigo-600"
+                  label="Score"
+                  color="indigo"
                   description="Quantifies answer reliability on a simple 0–10 scale."
                 />
                 <FeatureCard
-                  title="Primary Risk"
-                  accent="text-amber-600"
+                  label="Primary Risk"
+                  color="amber"
                   description="Identifies the highest-impact weakness immediately."
                 />
                 <FeatureCard
-                  title="Better Prompt"
-                  accent="text-emerald-600"
+                  label="Better Prompt"
+                  color="emerald"
                   description="Turns critique into a stronger next-pass instruction."
                 />
               </div>
@@ -269,6 +311,17 @@ export default function Home() {
                   Analyze reasoning →
                 </div>
               </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <SimpleCard
+                  label="Fast view"
+                  text="Score, verdict, and top risk in seconds."
+                />
+                <SimpleCard
+                  label="Deep audit"
+                  text="Full reasoning inspection and a stronger improved prompt."
+                />
+              </div>
             </div>
           </section>
         </header>
@@ -283,24 +336,125 @@ export default function Home() {
             description="A verification-style badge for AI-generated answers. Show reliability, primary risk, and reasoning quality in a format users instantly understand."
           />
 
+          <div className="mt-8 grid gap-6 lg:grid-cols-2">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                Example Badge
+              </div>
+              <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                  ✦ AI Answer Score
+                </div>
+                <div className="mt-2 text-3xl font-extrabold text-indigo-600">
+                  7.8 / 10
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-600">
+                  Moderately Reliable
+                </div>
+                <div className="mt-3 text-sm font-medium text-amber-700">
+                  Primary Risk: Missing constraints
+                </div>
+                <div className="mt-3 text-sm font-semibold text-indigo-600">
+                  Analyze reasoning →
+                </div>
+              </div>
+            </div>
+
+            <SimpleListCard
+              title="Why it matters"
+              items={[
+                "Gives AI answers a visible trust layer.",
+                "Shows users the primary risk immediately.",
+                "Links directly into a full reasoning audit.",
+                "Can evolve into an embeddable badge for publishers and AI apps.",
+              ]}
+            />
+          </div>
+        </section>
+
+        <section
+          id="how-it-works"
+          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+        >
+          <SectionIntro
+            eyebrow="How it works"
+            title="From answer to audit in seconds"
+            description="Score one answer or compare two. Surface the weak spots, then improve the answer with a stronger prompt."
+          />
+
+          <div className="mt-8 grid gap-6 md:grid-cols-3">
+            <StepCard
+              step="1. Inspect"
+              title="Score the answer"
+              description="Evaluate one answer or compare two answers side by side."
+            />
+            <StepCard
+              step="2. Diagnose"
+              title="Surface the main risk"
+              description="Identify weak assumptions, missing risks, reasoning gaps, and failure scenarios."
+            />
+            <StepCard
+              step="3. Improve"
+              title="Generate a stronger prompt"
+              description="Turn critique into a better next-pass prompt you can copy, rerun, or use directly in ChatGPT."
+            />
+          </div>
+        </section>
+
+        <section
+          id="leaderboard"
+          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+        >
+          <SectionIntro
+            eyebrow="Model snapshot"
+            title="Compare reasoning quality across answers"
+            description="AI Answer Score helps you see not just which answer is better, but why."
+          />
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <LeaderboardCard
+              name="ChatGPT"
+              score="7.8"
+              note="Reliable but incomplete"
+            />
+            <LeaderboardCard
+              name="Claude"
+              score="8.6"
+              note="Stronger nuance and structure"
+            />
+            <LeaderboardCard
+              name="Gemini"
+              score="6.9"
+              note="Useful but weaker reasoning"
+            />
+          </div>
+        </section>
+
+        <section
+          id="install-extension"
+          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+        >
+          <SectionIntro
+            eyebrow="Chrome Extension"
+            title="Add AI Answer Score to Chrome"
+            description="Install the extension to see AI Answer Score directly inside ChatGPT. Get a live trust badge, the primary risk, and one-click access to a full reasoning audit."
+          />
+
           <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div className="space-y-4">
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  What you get
-                </div>
-
-                <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                  <li>✦ AI Answer Score badge inside ChatGPT</li>
-                  <li>Primary risk surfaced instantly</li>
-                  <li>Open full audit for deep reasoning analysis</li>
-                  <li>Generate a stronger follow-up prompt in one click</li>
-                </ul>
-              </div>
+              <SimpleListCard
+                title="What you get"
+                items={[
+                  "✦ AI Answer Score badge inside ChatGPT",
+                  "Primary risk surfaced instantly",
+                  "Open full audit for deep reasoning analysis",
+                  "Generate a stronger follow-up prompt in one click",
+                ]}
+              />
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <a
-                  href={CHROME_WEB_STORE_URL}
+                  href="YOUR_CHROME_WEB_STORE_URL"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-500"
@@ -309,16 +463,15 @@ export default function Home() {
                 </a>
 
                 <a
-                  href="#how-it-works"
+                  href="/privacy"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
-                  See how it works
+                  Privacy Policy
                 </a>
               </div>
 
               <p className="text-sm text-slate-500">
-                Works on desktop Chrome. Installation happens through the Chrome
-                Web Store.
+                Works on desktop Chrome. Installation happens through the Chrome Web Store.
               </p>
             </div>
 
@@ -349,59 +502,6 @@ export default function Home() {
         </section>
 
         <section
-          id="how-it-works"
-          className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-3"
-        >
-          <StepCard
-            step="1. Inspect"
-            title="Score the answer"
-            description="Evaluate one answer or compare two answers side by side."
-            accent="bg-blue-50 text-blue-700"
-          />
-          <StepCard
-            step="2. Diagnose"
-            title="Surface the main risk"
-            description="Identify weak assumptions, missing risks, reasoning gaps, and failure scenarios."
-            accent="bg-amber-50 text-amber-700"
-          />
-          <StepCard
-            step="3. Improve"
-            title="Generate a stronger prompt"
-            description="Turn critique into a better next-pass prompt you can copy, rerun, or use directly in ChatGPT."
-            accent="bg-emerald-50 text-emerald-700"
-          />
-        </section>
-
-        <section
-          id="model-snapshot"
-          className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
-        >
-          <SectionIntro
-            eyebrow="Model snapshot"
-            title="Compare reasoning quality across answers"
-            description="AI Answer Score helps you see not just which answer is better, but why."
-          />
-
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <LeaderboardCard
-              name="ChatGPT"
-              score="7.8"
-              summary="Reliable but incomplete"
-            />
-            <LeaderboardCard
-              name="Claude"
-              score="8.6"
-              summary="Stronger nuance and structure"
-            />
-            <LeaderboardCard
-              name="Gemini"
-              score="6.9"
-              summary="Useful but weaker reasoning"
-            />
-          </div>
-        </section>
-
-        <section
           id="live-demo"
           className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
         >
@@ -419,18 +519,12 @@ export default function Home() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="flex flex-wrap gap-3">
-              <ModeSelector
-                active={!compare}
-                onClick={() => setCompare(false)}
-                label="Single answer"
-              />
-              <ModeSelector
-                active={compare}
-                onClick={() => setCompare(true)}
-                label="Compare two answers"
-              />
-            </div>
+            <ModeSelector
+              compare={compare}
+              setCompare={setCompare}
+              mode={mode}
+              setMode={setMode}
+            />
 
             <div className="grid gap-6">
               <div>
@@ -470,22 +564,6 @@ export default function Home() {
                   />
                 </div>
               )}
-
-              <div>
-                <label className="mb-2 block text-sm font-semibold text-slate-700">
-                  Analysis mode
-                </label>
-                <select
-                  value={mode}
-                  onChange={(e) => setMode(e.target.value as Mode)}
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
-                >
-                  <option value="blind_spots">Blind spots</option>
-                  <option value="reasoning">Reasoning</option>
-                  <option value="accuracy">Accuracy</option>
-                  <option value="decision_quality">Decision quality</option>
-                </select>
-              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -515,12 +593,16 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            <p className="text-sm text-slate-500">
+              {getModeDescription(mode)}
+            </p>
           </form>
         </section>
 
         {result ? (
           <section className="space-y-6">
-            {"comparison" in result ? (
+            {isCompareResult(result) ? (
               <CompareView result={result} />
             ) : (
               <SingleAnswerView result={result} />
@@ -599,7 +681,7 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
           <p className="leading-7 text-slate-700">{result.stress_test.summary}</p>
         </Card>
 
-        <Card title="AnswerScore">
+        <Card title="Answer Score">
           <ScoreDisplay score={result.stress_test.reliability_score} />
           <p className="mt-4 text-sm text-slate-600">
             {result.stress_test.reliability_explanation}
@@ -899,16 +981,14 @@ function CompareView({ result }: { result: CompareResult }) {
 
 function getModeDescription(mode: Mode) {
   switch (mode) {
-    case "blind_spots":
-      return "Surface missing assumptions, risks, and overlooked gaps.";
     case "reasoning":
-      return "Focus on logic quality, structure, and inferential strength.";
+      return "Reasoning mode focuses on logic, coherence, assumptions, and whether the answer actually supports its conclusion.";
     case "accuracy":
-      return "Emphasize factual trustworthiness and uncertainty handling.";
+      return "Accuracy mode is best when you want to inspect whether the answer may contain factual errors, unsupported claims, or weak evidence.";
     case "decision_quality":
-      return "Inspect whether the answer supports sound decision-making.";
+      return "Decision quality mode evaluates whether the answer helps someone make a sound decision under uncertainty, trade-offs, and risk.";
     default:
-      return "";
+      return "Blind spots mode surfaces missing assumptions, overlooked risks, and hidden weaknesses in the answer.";
   }
 }
 
@@ -917,29 +997,38 @@ function Card({
   children,
 }: {
   title: string;
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-4 text-xl font-bold text-slate-900">{title}</div>
-      {children}
-    </div>
+    <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h3 className="text-lg font-bold tracking-tight text-slate-900">
+        {title}
+      </h3>
+      <div className="mt-4">{children}</div>
+    </section>
   );
 }
 
 function FeatureCard({
-  title,
+  label,
   description,
-  accent,
+  color,
 }: {
-  title: string;
+  label: string;
   description: string;
-  accent: string;
+  color: "indigo" | "amber" | "emerald";
 }) {
+  const colorClasses =
+    color === "indigo"
+      ? "text-indigo-600"
+      : color === "amber"
+        ? "text-amber-600"
+        : "text-emerald-600";
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-      <div className={`text-xs font-bold uppercase tracking-[0.14em] ${accent}`}>
-        {title}
+      <div className={`text-xs font-bold uppercase tracking-[0.14em] ${colorClasses}`}>
+        {label}
       </div>
       <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
     </div>
@@ -950,16 +1039,14 @@ function StepCard({
   step,
   title,
   description,
-  accent,
 }: {
   step: string;
   title: string;
   description: string;
-  accent: string;
 }) {
   return (
-    <div className="space-y-3">
-      <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] ${accent}`}>
+    <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      <div className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
         {step}
       </div>
       <h3 className="text-xl font-bold text-slate-900">{title}</h3>
@@ -969,26 +1056,60 @@ function StepCard({
 }
 
 function ModeSelector({
-  active,
-  onClick,
-  label,
+  compare,
+  setCompare,
+  mode,
+  setMode,
 }: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
+  compare: boolean;
+  setCompare: (value: boolean) => void;
+  mode: Mode;
+  setMode: (value: Mode) => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-        active
-          ? "bg-indigo-600 text-white shadow-sm"
-          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-      }`}
-    >
-      {label}
-    </button>
+    <>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={() => setCompare(false)}
+          className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+            !compare
+              ? "bg-indigo-600 text-white shadow-sm"
+              : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          }`}
+        >
+          Single answer
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setCompare(true)}
+          className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+            compare
+              ? "bg-indigo-600 text-white shadow-sm"
+              : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+          }`}
+        >
+          Compare two answers
+        </button>
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-semibold text-slate-700">
+          Analysis mode
+        </label>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as Mode)}
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+        >
+          <option value="blind_spots">Blind spots</option>
+          <option value="reasoning">Reasoning</option>
+          <option value="accuracy">Accuracy</option>
+          <option value="decision_quality">Decision quality</option>
+        </select>
+      </div>
+    </>
   );
 }
 
@@ -1002,14 +1123,14 @@ function SectionIntro({
   description: string;
 }) {
   return (
-    <div className="space-y-3">
-      <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
+    <div>
+      <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
         {eyebrow}
       </div>
       <h2 className="text-3xl font-bold tracking-tight text-slate-900">
         {title}
       </h2>
-      <p className="max-w-3xl text-lg leading-8 text-slate-600">
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
         {description}
       </p>
     </div>
@@ -1028,17 +1149,34 @@ function DemoIssue({ text }: { text: string }) {
 function LeaderboardCard({
   name,
   score,
-  summary,
+  note,
 }: {
   name: string;
   score: string;
-  summary: string;
+  note: string;
 }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
       <div className="text-sm font-semibold text-slate-600">{name}</div>
       <div className="mt-2 text-3xl font-extrabold text-indigo-600">{score}</div>
-      <div className="mt-1 text-sm text-slate-500">{summary}</div>
+      <div className="mt-1 text-sm text-slate-500">{note}</div>
+    </div>
+  );
+}
+
+function SimpleCard({
+  label,
+  text,
+}: {
+  label: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+        {label}
+      </div>
+      <p className="mt-2 text-sm leading-6 text-slate-700">{text}</p>
     </div>
   );
 }
@@ -1051,21 +1189,16 @@ function SimpleListCard({
   items: string[];
 }) {
   return (
-    <Card title={title}>
-      {items?.length ? (
-        <ul className="space-y-3">
-          {items.map((item, index) => (
-            <li key={index} className="leading-7 text-slate-700">
-              {item}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="leading-7 text-slate-500">
-          No additional information returned.
-        </p>
-      )}
-    </Card>
+    <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+      <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
+        {title}
+      </div>
+      <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+        {items.map((item, index) => (
+          <li key={`${item}-${index}`}>{item}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -1085,21 +1218,17 @@ function WeightedListCard({
               key={`${item.text}-${index}`}
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
             >
-              <p className="leading-7 text-slate-700">{item.text}</p>
-              {item.level ? (
-                <div className="mt-3">
-                  <ImpactBadge level={item.level} />
-                </div>
-              ) : item.impact ? (
-                <div className="mt-3">
-                  <ImpactBadge level={item.impact} />
-                </div>
-              ) : null}
+              <div className="flex items-start justify-between gap-3">
+                <p className="leading-7 text-slate-700">{item.text}</p>
+                {item.impact ? <ImpactBadge level={item.impact} /> : null}
+              </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="leading-7 text-slate-500">No items returned.</p>
+        <p className="text-sm leading-7 text-slate-500">
+          No items were returned in this section.
+        </p>
       )}
     </Card>
   );
@@ -1121,29 +1250,27 @@ function ClaimReviewCard({
               key={`${item.claim}-${index}`}
               className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
             >
-              <p className="font-semibold text-slate-900">{item.claim}</p>
+              <div className="flex items-start justify-between gap-3">
+                <p className="font-semibold leading-7 text-slate-900">
+                  {item.claim}
+                </p>
+                {item.severity ? <SeverityBadge level={item.severity} /> : null}
+              </div>
               <p className="mt-2 leading-7 text-slate-700">{item.concern}</p>
-              {item.severity ? (
-                <div className="mt-3">
-                  <SeverityBadge level={item.severity} />
-                </div>
-              ) : null}
             </div>
           ))}
         </div>
       ) : (
-        <p className="leading-7 text-slate-500">No claim-level concerns returned.</p>
+        <p className="text-sm leading-7 text-slate-500">
+          No claim-level inspection items were returned.
+        </p>
       )}
     </Card>
   );
 }
 
-function ImpactBadge({
-  level,
-}: {
-  level: "high" | "medium" | "low";
-}) {
-  const styles =
+function ImpactBadge({ level }: { level: Level }) {
+  const classes =
     level === "high"
       ? "bg-red-100 text-red-700"
       : level === "medium"
@@ -1151,18 +1278,14 @@ function ImpactBadge({
         : "bg-slate-200 text-slate-700";
 
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${styles}`}>
+    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase ${classes}`}>
       {level} impact
     </span>
   );
 }
 
-function SeverityBadge({
-  level,
-}: {
-  level: "high" | "medium" | "low";
-}) {
-  const styles =
+function SeverityBadge({ level }: { level: Level }) {
+  const classes =
     level === "high"
       ? "bg-red-100 text-red-700"
       : level === "medium"
@@ -1170,7 +1293,7 @@ function SeverityBadge({
         : "bg-slate-200 text-slate-700";
 
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${styles}`}>
+    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase ${classes}`}>
       {level} severity
     </span>
   );
