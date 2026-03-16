@@ -737,7 +737,7 @@ function isStableEnough(answerElement, answer) {
   const quietForMs = now - lastMutationAt;
   const seenForMs = now - state.firstSeenAt;
 
-  return seenForMs >= 6000 && quietForMs >= 3500;
+  return seenForMs >= 2500 && quietForMs >= 1400;
 }
 
 async function processLatestConversationTurn() {
