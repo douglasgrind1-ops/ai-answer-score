@@ -340,11 +340,19 @@ function ensureInlineStyles() {
 }
 
 function findConversationBlocks() {
-  const blocks = document.querySelectorAll(
-    'article, [data-message-author-role="user"], [data-message-author-role="assistant"]'
+  const roleBlocks = document.querySelectorAll(
+    '[data-message-author-role="user"], [data-message-author-role="assistant"]'
   );
 
-  return Array.from(blocks);
+  if (roleBlocks && roleBlocks.length > 0) {
+    return Array.from(roleBlocks);
+  }
+
+  const articleBlocks = document.querySelectorAll(
+    'article[data-testid="conversation-turn"]'
+  );
+
+  return Array.from(articleBlocks);
 }
 
 function getTextFromElement(el) {
