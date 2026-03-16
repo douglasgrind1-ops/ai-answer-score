@@ -3,6 +3,7 @@ console.log("AI Answer Score extension loaded.");
 const processedBlocks = new WeakSet();
 const answerState = new WeakMap();
 const answerMutationTime = new WeakMap();
+const scoringInFlight = new WeakSet();
 
 function ensureInlineStyles() {
   if (document.getElementById("aas-inline-styles")) return;
@@ -760,10 +761,13 @@ async function processLatestConversationTurn() {
   }
 
   if (processedBlocks.has(answerElement)) return;
-  processedBlocks.add(answerElement);
+if (scoringInFlight.has(answerElement)) return;
 
-  try {
-    const result = await requestScore(question, answer);
+scoringInFlight.add(answerElement);
+
+try {
+  const result = await requestScore(question, answer);
+  processedBlocks.add(answerElement);
 
     const score =
       result && typeof result.reliability_score !== "undefined"
@@ -803,6 +807,8 @@ async function processLatestConversationTurn() {
       question,
       answer
     );
+  } finally {
+  scoringInFlight.delete(answerElement);
   }
 }
 
