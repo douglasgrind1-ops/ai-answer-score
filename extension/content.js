@@ -340,7 +340,11 @@ function ensureInlineStyles() {
 }
 
 function findConversationBlocks() {
-  return Array.from(document.querySelectorAll("article"));
+  const blocks = document.querySelectorAll(
+    'article, [data-message-author-role="user"], [data-message-author-role="assistant"]'
+  );
+
+  return Array.from(blocks);
 }
 
 function getTextFromElement(el) {
