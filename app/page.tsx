@@ -605,7 +605,7 @@ export default function Home() {
             {isCompareResult(result) ? (
               <CompareView result={result} />
             ) : (
-              <SingleAnswerView result={result} />
+              <SingleAnswerView result={result} question={question} />
             )}
           </section>
         ) : null}
@@ -642,13 +642,21 @@ Requirements:
 • give a structured, complete answer`;
 }
 
-function SingleAnswerView({ result }: { result: SingleResult }) {
+function SingleAnswerView({
+  result,
+  question,
+}: {
+  result: SingleResult;
+  question: string;
+}) {
   const primaryRisk =
     result.stress_test.missing_risks?.[0]?.text ||
     result.stress_test.weakest_assumptions?.[0]?.text ||
     result.stress_test.reasoning_gaps?.[0]?.text ||
     "No dominant reliability risk identified.";
 
+  const improvedPrompt = buildImprovedPromptFromQuestion(question, result);
+  
   return (
     <>
       <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
@@ -692,6 +700,25 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
               <p className="mt-2 leading-7 text-slate-700">{primaryRisk}</p>
             </div>
 
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
+                Improved Prompt
+              </div>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                {improvedPrompt}
+              </p>
+
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(improvedPrompt)}
+                  className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Copy Prompt
+                </button>
+              </div>
+            </div>
+            
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
               <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
                 Reliability Explanation
