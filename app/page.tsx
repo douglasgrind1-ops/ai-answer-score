@@ -1,68 +1,64 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { FormEvent, ReactNode, useState } from "react";
 
-type Mode =
-  | 'blind_spots'
-  | 'risk_review'
-  | 'devils_advocate'
-  | 'alternative_strategy';
+type Mode = "blind_spots" | "reasoning" | "accuracy" | "decision_quality";
 
 type WeightedItem = {
   text: string;
-  impact: 'high' | 'medium' | 'low';
+  level?: "high" | "medium" | "low";
+  impact?: "high" | "medium" | "low";
 };
 
 type ClaimReview = {
   claim: string;
   concern: string;
-  severity: 'high' | 'medium' | 'low';
+  severity?: "high" | "medium" | "low";
+};
+
+type Reconstruction = {
+  main_conclusion: string;
+  supporting_claims: string[];
+  assumptions: string[];
+  uncertain_or_context_dependent_claims: string[];
+};
+
+type StressTest = {
+  reliability_score: number;
+  summary: string;
+  reliability_explanation: string;
+  best_follow_up_question: string;
+  alternative_perspective: string;
+  weakest_assumptions: WeightedItem[];
+  missing_risks: WeightedItem[];
+  reasoning_gaps: WeightedItem[];
+  failure_scenarios: WeightedItem[];
+  claim_reviews: ClaimReview[];
 };
 
 type SingleResult = {
-  type: 'single';
-  reconstruction: {
-    main_conclusion: string;
-    supporting_claims: string[];
-    assumptions: string[];
-    uncertain_or_context_dependent_claims: string[];
-  };
-  stress_test: {
-    weakest_assumptions: WeightedItem[];
-    missing_risks: WeightedItem[];
-    reasoning_gaps: WeightedItem[];
-    failure_scenarios: WeightedItem[];
-    alternative_perspective: string;
-    best_follow_up_question: string;
-    summary: string;
-    reliability_score: number;
-    reliability_explanation: string;
-    claim_reviews: ClaimReview[];
-  };
+  reconstruction: Reconstruction;
+  stress_test: StressTest;
+};
+
+type Comparison = {
+  winner: "A" | "B" | "tie";
+  winner_rationale: string;
+  key_reasoning_difference?: string;
+  score_rationale?: string;
+  when_other_is_better: string;
+  decision_takeaway: string;
 };
 
 type CompareResult = {
-  type: 'compare';
   answerA: SingleResult;
   answerB: SingleResult;
-  comparison: {
-    winner: 'A' | 'B' | 'tie';
-    winner_rationale: string;
-    key_reasoning_difference?: string;
-    score_rationale?: string;
-    when_other_is_better: string;
-    decision_takeaway: string;
-    comparison_summary: string;
-    answerA_score: number;
-    answerB_score: number;
-    answerA_strengths: string[];
-    answerB_strengths: string[];
-    answerA_weaknesses: string[];
-    answerB_weaknesses: string[];
-  };
+  comparison: Comparison;
 };
 
 type Result = SingleResult | CompareResult;
+
+const CHROME_WEB_STORE_URL = "YOUR_CHROME_WEB_STORE_URL";
 
 export default function Home() {
   const [question, setQuestion] = useState("");
@@ -74,7 +70,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -86,8 +82,8 @@ export default function Home() {
             type: "compare",
             mode,
             question,
-            answerA: answer,
-            answerB: answerB,
+            answer_a: answer,
+            answer_b: answerB,
           }
         : {
             type: "single",
@@ -110,7 +106,16 @@ export default function Home() {
         throw new Error(data?.error || "Something went wrong.");
       }
 
-      setResult(data);
+      const normalized =
+        "answer_a" in data || "answer_b" in data
+          ? {
+              ...data,
+              answerA: data.answerA || data.answer_a,
+              answerB: data.answerB || data.answer_b,
+            }
+          : data;
+
+      setResult(normalized);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -141,7 +146,7 @@ export default function Home() {
               <a href="#trust-badge" className="hover:text-slate-900">
                 Trust badge
               </a>
-              <a href="#leaderboard" className="hover:text-slate-900">
+              <a href="#model-snapshot" className="hover:text-slate-900">
                 Model snapshot
               </a>
               <a href="#live-demo" className="hover:text-slate-900">
@@ -150,10 +155,12 @@ export default function Home() {
             </div>
 
             <a
-              href="#live-demo"
+              href={CHROME_WEB_STORE_URL}
+              target="_blank"
+              rel="noreferrer"
               className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:from-blue-500 hover:to-indigo-500"
             >
-              Try demo
+              Add to Chrome
             </a>
           </nav>
         </div>
@@ -194,40 +201,31 @@ export default function Home() {
                 </a>
 
                 <a
-                  href="#how-it-works"
+                  href={CHROME_WEB_STORE_URL}
+                  target="_blank"
+                  rel="noreferrer"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
                 >
-                  See how it works
+                  Add to Chrome
                 </a>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                    Score
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Quantifies answer reliability on a simple 0–10 scale.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-600">
-                    Primary Risk
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Identifies the highest-impact weakness immediately.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">
-                    Better Prompt
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Turns critique into a stronger next-pass instruction.
-                  </p>
-                </div>
+                <FeatureCard
+                  title="Score"
+                  accent="text-indigo-600"
+                  description="Quantifies answer reliability on a simple 0–10 scale."
+                />
+                <FeatureCard
+                  title="Primary Risk"
+                  accent="text-amber-600"
+                  description="Identifies the highest-impact weakness immediately."
+                />
+                <FeatureCard
+                  title="Better Prompt"
+                  accent="text-emerald-600"
+                  description="Turns critique into a stronger next-pass instruction."
+                />
               </div>
             </div>
 
@@ -271,26 +269,6 @@ export default function Home() {
                   Analyze reasoning →
                 </div>
               </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-                    Fast view
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Score, verdict, and top risk in seconds.
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-                    Deep audit
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-700">
-                    Full reasoning inspection and a stronger improved prompt.
-                  </p>
-                </div>
-              </div>
             </div>
           </section>
         </header>
@@ -299,23 +277,56 @@ export default function Home() {
           id="trust-badge"
           className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-            Trust Badge
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-            AI Answer Score Trust Badge
-          </h2>
-          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-            A verification-style badge for AI-generated answers. Show reliability,
-            primary risk, and reasoning quality in a format users instantly
-            understand.
-          </p>
+          <SectionIntro
+            eyebrow="Trust Badge"
+            title="AI Answer Score Trust Badge"
+            description="A verification-style badge for AI-generated answers. Show reliability, primary risk, and reasoning quality in a format users instantly understand."
+          />
 
-          <div className="mt-8 grid gap-6 lg:grid-cols-2">
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                Example Badge
+          <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                  What you get
+                </div>
+
+                <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                  <li>✦ AI Answer Score badge inside ChatGPT</li>
+                  <li>Primary risk surfaced instantly</li>
+                  <li>Open full audit for deep reasoning analysis</li>
+                  <li>Generate a stronger follow-up prompt in one click</li>
+                </ul>
               </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={CHROME_WEB_STORE_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-500"
+                >
+                  Add to Chrome
+                </a>
+
+                <a
+                  href="#how-it-works"
+                  className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                  See how it works
+                </a>
+              </div>
+
+              <p className="text-sm text-slate-500">
+                Works on desktop Chrome. Installation happens through the Chrome
+                Web Store.
+              </p>
+            </div>
+
+            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-sm">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                Extension Preview
+              </div>
+
               <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
                   ✦ AI Answer Score
@@ -334,20 +345,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-
-            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">
-                Why it matters
-              </div>
-              <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                <li>Gives AI answers a visible trust layer.</li>
-                <li>Shows users the primary risk immediately.</li>
-                <li>Links directly into a full reasoning audit.</li>
-                <li>
-                  Can evolve into an embeddable badge for publishers and AI apps.
-                </li>
-              </ul>
-            </div>
           </div>
         </section>
 
@@ -355,84 +352,52 @@ export default function Home() {
           id="how-it-works"
           className="grid gap-6 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-3"
         >
-          <div className="space-y-3">
-            <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-blue-700">
-              1. Inspect
-            </div>
-            <h3 className="text-xl font-bold text-slate-900">
-              Score the answer
-            </h3>
-            <p className="text-sm leading-7 text-slate-700">
-              Evaluate one answer or compare two answers side by side.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <div className="inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
-              2. Diagnose
-            </div>
-            <h3 className="text-xl font-bold text-slate-900">
-              Surface the main risk
-            </h3>
-            <p className="text-sm leading-7 text-slate-700">
-              Identify weak assumptions, missing risks, reasoning gaps, and
-              failure scenarios.
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <div className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">
-              3. Improve
-            </div>
-            <h3 className="text-xl font-bold text-slate-900">
-              Generate a stronger prompt
-            </h3>
-            <p className="text-sm leading-7 text-slate-700">
-              Turn critique into a better next-pass prompt you can copy, rerun,
-              or use directly in ChatGPT.
-            </p>
-          </div>
+          <StepCard
+            step="1. Inspect"
+            title="Score the answer"
+            description="Evaluate one answer or compare two answers side by side."
+            accent="bg-blue-50 text-blue-700"
+          />
+          <StepCard
+            step="2. Diagnose"
+            title="Surface the main risk"
+            description="Identify weak assumptions, missing risks, reasoning gaps, and failure scenarios."
+            accent="bg-amber-50 text-amber-700"
+          />
+          <StepCard
+            step="3. Improve"
+            title="Generate a stronger prompt"
+            description="Turn critique into a better next-pass prompt you can copy, rerun, or use directly in ChatGPT."
+            accent="bg-emerald-50 text-emerald-700"
+          />
         </section>
 
         <section
-          id="leaderboard"
+          id="model-snapshot"
           className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
         >
-          <div className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-            Model snapshot
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-            Compare reasoning quality across answers
-          </h2>
-          <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-600">
-            AI Answer Score helps you see not just which answer is better, but
-            why.
-          </p>
+          <SectionIntro
+            eyebrow="Model snapshot"
+            title="Compare reasoning quality across answers"
+            description="AI Answer Score helps you see not just which answer is better, but why."
+          />
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div className="text-sm font-semibold text-slate-600">ChatGPT</div>
-              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
-                7.8
-              </div>
-              <div className="mt-1 text-sm text-slate-500">Reliable but incomplete</div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div className="text-sm font-semibold text-slate-600">Claude</div>
-              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
-                8.6
-              </div>
-              <div className="mt-1 text-sm text-slate-500">Stronger nuance and structure</div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div className="text-sm font-semibold text-slate-600">Gemini</div>
-              <div className="mt-2 text-3xl font-extrabold text-indigo-600">
-                6.9
-              </div>
-              <div className="mt-1 text-sm text-slate-500">Useful but weaker reasoning</div>
-            </div>
+            <LeaderboardCard
+              name="ChatGPT"
+              score="7.8"
+              summary="Reliable but incomplete"
+            />
+            <LeaderboardCard
+              name="Claude"
+              score="8.6"
+              summary="Stronger nuance and structure"
+            />
+            <LeaderboardCard
+              name="Gemini"
+              score="6.9"
+              summary="Useful but weaker reasoning"
+            />
           </div>
         </section>
 
@@ -455,29 +420,16 @@ export default function Home() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
+              <ModeSelector
+                active={!compare}
                 onClick={() => setCompare(false)}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  !compare
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                Single answer
-              </button>
-
-              <button
-                type="button"
+                label="Single answer"
+              />
+              <ModeSelector
+                active={compare}
                 onClick={() => setCompare(true)}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-                  compare
-                    ? "bg-indigo-600 text-white shadow-sm"
-                    : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-                }`}
-              >
-                Compare two answers
-              </button>
+                label="Compare two answers"
+              />
             </div>
 
             <div className="grid gap-6">
@@ -545,35 +497,24 @@ export default function Home() {
                 {loading ? "Analyzing..." : "Run analysis"}
               </button>
 
+              {error ? (
+                <p className="text-sm font-medium text-red-600">{error}</p>
+              ) : null}
+            </div>
+
             {loading && (
               <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
                   AI inspection in progress
                 </div>
-            
+
                 <div className="mt-4 space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
-                    Inspecting answer structure
-                  </div>
-            
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
-                    Evaluating reasoning quality
-                  </div>
-            
-                  <div className="flex items-center gap-3 text-sm text-slate-700">
-                    <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
-                    Generating trust score
-                  </div>
+                  <DemoIssue text="Inspecting answer structure" />
+                  <DemoIssue text="Evaluating reasoning quality" />
+                  <DemoIssue text="Generating trust score" />
                 </div>
               </div>
             )}
-              
-              {error ? (
-                <p className="text-sm font-medium text-red-600">{error}</p>
-              ) : null}
-            </div>
           </form>
         </section>
 
@@ -663,9 +604,6 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
           <p className="mt-4 text-sm text-slate-600">
             {result.stress_test.reliability_explanation}
           </p>
-          <div className="mt-4">
-            <ReliabilityGuide score={result.stress_test.reliability_score} />
-          </div>
         </Card>
 
         <Card title="Best follow-up question">
@@ -716,40 +654,21 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <Card title="Supporting claims">
-          <ul className="space-y-3">
-            {result.reconstruction.supporting_claims.map((claim, index) => (
-              <li key={index} className="leading-7 text-slate-700">
-                {claim}
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        <Card title="Uncertain or context-dependent claims">
-          <ul className="space-y-3">
-            {result.reconstruction.uncertain_or_context_dependent_claims.map(
-              (claim, index) => (
-                <li key={index} className="leading-7 text-slate-700">
-                  {claim}
-                </li>
-              )
-            )}
-          </ul>
-        </Card>
+        <SimpleListCard
+          title="Supporting claims"
+          items={result.reconstruction.supporting_claims}
+        />
+        <SimpleListCard
+          title="Uncertain or context-dependent claims"
+          items={result.reconstruction.uncertain_or_context_dependent_claims}
+        />
       </section>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <Card title="Underlying assumptions">
-          <ul className="space-y-3">
-            {result.reconstruction.assumptions.map((assumption, index) => (
-              <li key={index} className="leading-7 text-slate-700">
-                {assumption}
-              </li>
-            ))}
-          </ul>
-        </Card>
-
+        <SimpleListCard
+          title="Underlying assumptions"
+          items={result.reconstruction.assumptions}
+        />
         <Card title="Recommended next question">
           <p className="leading-7 text-slate-700">
             {result.stress_test.best_follow_up_question}
@@ -759,6 +678,7 @@ function SingleAnswerView({ result }: { result: SingleResult }) {
     </>
   );
 }
+
 function CompareView({ result }: { result: CompareResult }) {
   return (
     <>
@@ -979,16 +899,16 @@ function CompareView({ result }: { result: CompareResult }) {
 
 function getModeDescription(mode: Mode) {
   switch (mode) {
-    case 'blind_spots':
-      return 'Highlights what the answer overlooked, what context is missing, and what assumptions may be hidden.';
-    case 'risk_review':
-      return 'Focuses on downside, execution risk, adoption friction, and failure modes.';
-    case 'devils_advocate':
-      return 'Makes the strongest fair case against the answer’s recommendation without forcing fake disagreement.';
-    case 'alternative_strategy':
-      return 'Looks for a better plan, different sequencing, or a lower-risk way to achieve the same goal.';
+    case "blind_spots":
+      return "Surface missing assumptions, risks, and overlooked gaps.";
+    case "reasoning":
+      return "Focus on logic quality, structure, and inferential strength.";
+    case "accuracy":
+      return "Emphasize factual trustworthiness and uncertainty handling.";
+    case "decision_quality":
+      return "Inspect whether the answer supports sound decision-making.";
     default:
-      return '';
+      return "";
   }
 }
 
@@ -997,33 +917,31 @@ function Card({
   children,
 }: {
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">{title}</h2>
+    <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="mb-4 text-xl font-bold text-slate-900">{title}</div>
       {children}
-    </section>
+    </div>
   );
 }
 
 function FeatureCard({
   title,
   description,
-  className,
+  accent,
 }: {
   title: string;
   description: string;
-  className?: string;
+  accent: string;
 }) {
   return (
-    <div
-      className={`rounded-3xl border p-5 shadow-sm ${
-        className ?? 'border-slate-200 bg-white'
-      }`}
-    >
-      <p className="text-sm font-semibold text-slate-900">{title}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+    <div className="rounded-2xl border border-slate-200 bg-white/90 p-4 shadow-sm">
+      <div className={`text-xs font-bold uppercase tracking-[0.14em] ${accent}`}>
+        {title}
+      </div>
+      <p className="mt-2 text-sm leading-6 text-slate-700">{description}</p>
     </div>
   );
 }
@@ -1032,88 +950,45 @@ function StepCard({
   step,
   title,
   description,
+  accent,
 }: {
   step: string;
   title: string;
   description: string;
+  accent: string;
 }) {
   return (
-    <div className="rounded-3xl border border-slate-200 bg-white/85 p-5 shadow-sm backdrop-blur">
-      <p className="text-sm font-semibold text-blue-700">{step}</p>
-      <h3 className="mt-2 text-lg font-semibold text-slate-900">{title}</h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+    <div className="space-y-3">
+      <div className={`inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] ${accent}`}>
+        {step}
+      </div>
+      <h3 className="text-xl font-bold text-slate-900">{title}</h3>
+      <p className="text-sm leading-7 text-slate-700">{description}</p>
     </div>
   );
 }
 
 function ModeSelector({
-  mode,
-  setMode,
+  active,
+  onClick,
+  label,
 }: {
-  mode: Mode;
-  setMode: (m: Mode) => void;
+  active: boolean;
+  onClick: () => void;
+  label: string;
 }) {
-  const modes = [
-    {
-      key: 'blind_spots',
-      title: 'Blind Spot Finder',
-      description: 'Find missing context and hidden assumptions in the AI’s reasoning.',
-      icon: '🔎',
-    },
-    {
-      key: 'risk_review',
-      title: 'Risk Review',
-      description: 'Identify risks, edge cases, and failure scenarios the AI may have ignored.',
-      icon: '⚠️',
-    },
-    {
-      key: 'devils_advocate',
-      title: "Devil's Advocate",
-      description: "Generate strong counterarguments that challenge the AI's conclusion.",
-      icon: '🧠',
-    },
-    {
-      key: 'alternative_strategy',
-      title: 'Alternative Strategy',
-      description: 'Suggest better or safer approaches the AI may have overlooked.',
-      icon: '🔁',
-    },
-  ];
-
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-lg font-semibold text-slate-900">
-          Choose how to evaluate the AI answer
-        </h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Analyze the response from different angles to uncover reasoning gaps and risks.
-        </p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {modes.map((m) => (
-          <button
-            key={m.key}
-            type="button"
-            onClick={() => setMode(m.key as Mode)}
-            className={`rounded-2xl border p-4 text-left transition ${
-              mode === m.key
-                ? 'border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-100'
-                : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40'
-            }`}
-          >
-            <div className="text-lg">{m.icon}</div>
-
-            <p className="mt-3 font-semibold text-slate-900">{m.title}</p>
-
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              {m.description}
-            </p>
-          </button>
-        ))}
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+        active
+          ? "bg-indigo-600 text-white shadow-sm"
+          : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -1127,66 +1002,43 @@ function SectionIntro({
   description: string;
 }) {
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium uppercase tracking-[0.16em] text-blue-700">
+    <div className="space-y-3">
+      <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
         {eyebrow}
-      </p>
-      <h2 className="text-3xl font-bold tracking-tight text-slate-950">
+      </div>
+      <h2 className="text-3xl font-bold tracking-tight text-slate-900">
         {title}
       </h2>
-      <p className="max-w-3xl leading-7 text-slate-600">{description}</p>
+      <p className="max-w-3xl text-lg leading-8 text-slate-600">
+        {description}
+      </p>
     </div>
   );
 }
 
-function TrustPill({ text }: { text: string }) {
+function DemoIssue({ text }: { text: string }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-medium text-slate-700 shadow-sm">
+    <div className="flex items-center gap-3 text-sm text-slate-700">
+      <div className="h-2 w-2 animate-pulse rounded-full bg-indigo-500"></div>
       {text}
     </div>
   );
 }
 
-function DemoIssue({
-  label,
-  text,
-}: {
-  label: string;
-  text: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-        {label}
-      </p>
-      <p className="mt-1 text-sm leading-6 text-slate-700">{text}</p>
-    </div>
-  );
-}
-
 function LeaderboardCard({
-  rank,
-  model,
+  name,
   score,
-  note,
-  accent,
+  summary,
 }: {
-  rank: string;
-  model: string;
+  name: string;
   score: string;
-  note: string;
-  accent: string;
+  summary: string;
 }) {
   return (
-    <div className={`rounded-3xl border p-5 shadow-sm ${accent}`}>
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-        {rank}
-      </p>
-      <div className="mt-3 flex items-end justify-between gap-3">
-        <h3 className="text-lg font-semibold text-slate-900">{model}</h3>
-        <span className="text-3xl font-bold text-slate-950">{score}</span>
-      </div>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{note}</p>
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+      <div className="text-sm font-semibold text-slate-600">{name}</div>
+      <div className="mt-2 text-3xl font-extrabold text-indigo-600">{score}</div>
+      <div className="mt-1 text-sm text-slate-500">{summary}</div>
     </div>
   );
 }
@@ -1200,14 +1052,18 @@ function SimpleListCard({
 }) {
   return (
     <Card title={title}>
-      {items.length === 0 ? (
-        <p className="text-slate-500">No items returned.</p>
-      ) : (
-        <ul className="list-disc space-y-2 pl-5 text-slate-700">
+      {items?.length ? (
+        <ul className="space-y-3">
           {items.map((item, index) => (
-            <li key={`${title}-${index}`}>{item}</li>
+            <li key={index} className="leading-7 text-slate-700">
+              {item}
+            </li>
           ))}
         </ul>
+      ) : (
+        <p className="leading-7 text-slate-500">
+          No additional information returned.
+        </p>
       )}
     </Card>
   );
@@ -1220,24 +1076,30 @@ function WeightedListCard({
   title: string;
   items: WeightedItem[];
 }) {
-  const sortedItems = [...items].sort((a, b) => {
-    const rank = { high: 0, medium: 1, low: 2 };
-    return rank[a.impact] - rank[b.impact];
-  });
-
   return (
     <Card title={title}>
-      {sortedItems.length === 0 ? (
-        <p className="text-slate-500">No items returned.</p>
-      ) : (
-        <ul className="space-y-3">
-          {sortedItems.map((item, index) => (
-            <li key={`${title}-${index}`} className="flex items-start gap-3">
-              <ImpactBadge level={item.impact} />
-              <span className="leading-7 text-slate-700">{item.text}</span>
-            </li>
+      {items?.length ? (
+        <div className="space-y-3">
+          {items.map((item, index) => (
+            <div
+              key={`${item.text}-${index}`}
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+            >
+              <p className="leading-7 text-slate-700">{item.text}</p>
+              {item.level ? (
+                <div className="mt-3">
+                  <ImpactBadge level={item.level} />
+                </div>
+              ) : item.impact ? (
+                <div className="mt-3">
+                  <ImpactBadge level={item.impact} />
+                </div>
+              ) : null}
+            </div>
           ))}
-        </ul>
+        </div>
+      ) : (
+        <p className="leading-7 text-slate-500">No items returned.</p>
       )}
     </Card>
   );
@@ -1250,69 +1112,66 @@ function ClaimReviewCard({
   title: string;
   items: ClaimReview[];
 }) {
-  const sortedItems = [...items].sort((a, b) => {
-    const rank = { high: 0, medium: 1, low: 2 };
-    return rank[a.severity] - rank[b.severity];
-  });
-
   return (
-    <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm backdrop-blur">
-      <h2 className="mb-3 text-lg font-semibold text-slate-900">{title}</h2>
-
-      {sortedItems.length === 0 ? (
-        <p className="text-slate-500">No claim-level issues returned.</p>
-      ) : (
+    <Card title={title}>
+      {items?.length ? (
         <div className="space-y-4">
-          {sortedItems.map((item, index) => (
+          {items.map((item, index) => (
             <div
               key={`${item.claim}-${index}`}
-              className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4"
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
             >
-              <div className="flex items-start gap-3">
-                <SeverityBadge level={item.severity} />
-                <div>
-                  <p className="font-medium text-slate-900">{item.claim}</p>
-                  <p className="mt-1 leading-7 text-slate-700">
-                    {item.concern}
-                  </p>
+              <p className="font-semibold text-slate-900">{item.claim}</p>
+              <p className="mt-2 leading-7 text-slate-700">{item.concern}</p>
+              {item.severity ? (
+                <div className="mt-3">
+                  <SeverityBadge level={item.severity} />
                 </div>
-              </div>
+              ) : null}
             </div>
           ))}
         </div>
+      ) : (
+        <p className="leading-7 text-slate-500">No claim-level concerns returned.</p>
       )}
-    </section>
+    </Card>
   );
 }
 
-function ImpactBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const styles = {
-    high: 'border-red-200 bg-red-100 text-red-700',
-    medium: 'border-amber-200 bg-amber-100 text-amber-700',
-    low: 'border-slate-200 bg-slate-100 text-slate-700',
-  };
+function ImpactBadge({
+  level,
+}: {
+  level: "high" | "medium" | "low";
+}) {
+  const styles =
+    level === "high"
+      ? "bg-red-100 text-red-700"
+      : level === "medium"
+        ? "bg-amber-100 text-amber-700"
+        : "bg-slate-200 text-slate-700";
 
   return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-medium ${styles[level]}`}
-    >
-      {level}
+    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${styles}`}>
+      {level} impact
     </span>
   );
 }
 
-function SeverityBadge({ level }: { level: 'high' | 'medium' | 'low' }) {
-  const styles = {
-    high: 'border-red-200 bg-red-100 text-red-700',
-    medium: 'border-amber-200 bg-amber-100 text-amber-700',
-    low: 'border-slate-200 bg-slate-100 text-slate-700',
-  };
+function SeverityBadge({
+  level,
+}: {
+  level: "high" | "medium" | "low";
+}) {
+  const styles =
+    level === "high"
+      ? "bg-red-100 text-red-700"
+      : level === "medium"
+        ? "bg-amber-100 text-amber-700"
+        : "bg-slate-200 text-slate-700";
 
   return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-medium ${styles[level]}`}
-    >
-      {level}
+    <span className={`rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wide ${styles}`}>
+      {level} severity
     </span>
   );
 }
