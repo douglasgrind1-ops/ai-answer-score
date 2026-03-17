@@ -3,10 +3,6 @@
 import { FormEvent } from "react";
 import type { Mode } from "./types";
 
-useEffect(() => {
-  window.scrollTo(0, 0);
-}, []);
-
 const CHROME_WEB_STORE_URL = "YOUR_CHROME_WEB_STORE_URL";
 
 export function HeaderNav() {
