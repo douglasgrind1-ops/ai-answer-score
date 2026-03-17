@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "AI Answer Score",
+  "name": "AI Answer Score - Trust AI Answers",
   "version": "1.0.0",
-  "description": "Analyze ChatGPT answers with a reliability score and reasoning audit.",
+  "description": "Score AI answers, detect risks, and generate stronger follow-up prompts instantly.",
   "permissions": ["storage"],
   "host_permissions": [
     "https://chat.openai.com/*",
