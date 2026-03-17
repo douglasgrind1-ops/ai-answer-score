@@ -441,28 +441,26 @@ export function LiveDemoPanel({
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col items-start gap-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+              Start here
+            </div>
+          
             <button
               type="button"
               onClick={loadSample}
-              className={`inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition ${
-                usingSample
-                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20"
-                  : "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-sm hover:from-blue-500 hover:to-indigo-500"
-              }`}
+              className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-500"
             >
-              {usingSample ? "Run demo" : "Load sample demo"}
+              <span>Run sample demo</span>
+          
+              <span className="ml-2 transition-transform group-hover:translate-x-1">
+                →
+              </span>
             </button>
-
-            {hasAnyInput ? (
-              <button
-                type="button"
-                onClick={clearSample}
-                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-              >
-                Clear
-              </button>
-            ) : null}
+          
+            <p className="text-xs text-slate-500">
+              Instantly see scoring, risks, and a stronger prompt
+            </p>
           </div>
         </div>
       </div>
