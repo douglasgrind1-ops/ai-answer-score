@@ -3,6 +3,10 @@
 import { FormEvent } from "react";
 import type { Mode } from "./types";
 
+useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
+
 const CHROME_WEB_STORE_URL = "YOUR_CHROME_WEB_STORE_URL";
 
 export function HeaderNav() {
@@ -30,7 +34,7 @@ export function HeaderNav() {
           <a href="#model-snapshot" className="hover:text-slate-900">
             Model snapshot
           </a>
-          <a href="#live-demo" className="hover:text-slate-900">
+         <a href="/#live-demo">Try demo</a>
             Live demo
           </a>
           <a href="#install-extension" className="hover:text-slate-900">
