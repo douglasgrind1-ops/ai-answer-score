@@ -377,6 +377,37 @@ export function LiveDemoPanel({
   error,
   onSubmit,
 }: LiveDemoPanelProps) {
+  const sampleQuestion =
+    "Does the ACT provide an objective measure of college readiness?";
+
+  const sampleAnswer =
+    "Yes. The ACT provides an objective measure of college readiness because it uses a standardized test format to evaluate all students equally. Since every student takes the same exam under similar conditions, the results offer a fair and reliable indicator of whether a student is prepared for college-level work.";
+
+  const usingSample =
+    !compare &&
+    question.trim() === sampleQuestion &&
+    answer.trim() === sampleAnswer &&
+    !answerB.trim();
+
+  const hasAnyInput =
+    question.trim().length > 0 ||
+    answer.trim().length > 0 ||
+    answerB.trim().length > 0;
+
+  function loadSample() {
+    setCompare(false);
+    setMode("blind_spots");
+    setQuestion(sampleQuestion);
+    setAnswer(sampleAnswer);
+    setAnswerB("");
+  }
+
+  function clearSample() {
+    setQuestion("");
+    setAnswer("");
+    setAnswerB("");
+  }
+
   return (
     <section
       id="live-demo"
@@ -386,13 +417,54 @@ export function LiveDemoPanel({
         <div className="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
           Live demo
         </div>
+
         <h2 className="text-3xl font-bold tracking-tight text-slate-900">
           Score an answer right now
         </h2>
+
         <p className="max-w-3xl text-lg leading-8 text-slate-600">
-          Paste a question and one or two answers to see where reasoning is
-          strong, where it breaks down, and how to improve it.
+          Try a sample analysis or paste your own question and answer to see
+          where reasoning is strong, where it breaks down, and how to improve
+          it.
         </p>
+      </div>
+
+      <div className="mb-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
+            <div className="inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
+              Suggested demo
+            </div>
+            <p className="text-sm leading-6 text-slate-700">
+              Start with a prefilled example to see the trust score, risks, and
+              stronger follow-up prompt instantly.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={loadSample}
+              className={`inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition ${
+                usingSample
+                  ? "animate-pulse bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20"
+                  : "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-sm hover:from-blue-500 hover:to-indigo-500"
+              }`}
+            >
+              {usingSample ? "Run demo" : "Load sample demo"}
+            </button>
+
+            {hasAnyInput ? (
+              <button
+                type="button"
+                onClick={clearSample}
+                className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+              >
+                Clear
+              </button>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-6">
@@ -418,7 +490,11 @@ export function LiveDemoPanel({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Paste the user question here..."
-              className="min-h-[110px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+              className={`min-h-[110px] w-full rounded-2xl border px-4 py-3 text-sm text-slate-900 outline-none transition ${
+                usingSample
+                  ? "border-indigo-300 bg-indigo-50/40 focus:border-indigo-400 focus:bg-white"
+                  : "border-slate-200 bg-slate-50 focus:border-indigo-400 focus:bg-white"
+              }`}
             />
           </div>
 
@@ -430,11 +506,15 @@ export function LiveDemoPanel({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="Paste the first answer here..."
-              className="min-h-[180px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
+              className={`min-h-[180px] w-full rounded-2xl border px-4 py-3 text-sm text-slate-900 outline-none transition ${
+                usingSample
+                  ? "border-indigo-300 bg-indigo-50/40 focus:border-indigo-400 focus:bg-white"
+                  : "border-slate-200 bg-slate-50 focus:border-indigo-400 focus:bg-white"
+              }`}
             />
           </div>
 
-          {compare && (
+          {compare ? (
             <div>
               <label className="mb-2 block text-sm font-semibold text-slate-700">
                 Answer B
@@ -446,7 +526,7 @@ export function LiveDemoPanel({
                 className="min-h-[180px] w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-400 focus:bg-white"
               />
             </div>
-          )}
+          ) : null}
 
           <div>
             <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -469,9 +549,13 @@ export function LiveDemoPanel({
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className={`inline-flex items-center justify-center rounded-2xl px-6 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              usingSample
+                ? "animate-pulse bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-indigo-500"
+                : "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20 hover:from-blue-500 hover:to-indigo-500"
+            }`}
           >
-            {loading ? "Analyzing..." : "Run analysis"}
+            {loading ? "Analyzing..." : usingSample ? "Run demo" : "Run analysis"}
           </button>
 
           {error ? (
@@ -479,7 +563,14 @@ export function LiveDemoPanel({
           ) : null}
         </div>
 
-        {loading && (
+        {usingSample ? (
+          <p className="text-sm font-medium text-indigo-600">
+            This sample is designed to reveal assumptions, missing constraints,
+            and reasoning gaps quickly.
+          </p>
+        ) : null}
+
+        {loading ? (
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
               AI inspection in progress
@@ -491,14 +582,13 @@ export function LiveDemoPanel({
               <DemoIssue text="Generating trust score" />
             </div>
           </div>
-        )}
+        ) : null}
 
         <p className="text-sm text-slate-500">{getModeDescription(mode)}</p>
       </form>
     </section>
   );
 }
-
 function getModeDescription(mode: Mode) {
   switch (mode) {
     case "blind_spots":
