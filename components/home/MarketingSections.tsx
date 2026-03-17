@@ -142,7 +142,7 @@ export function HeroSection() {
             <div className="mt-1 text-sm font-semibold text-slate-600">
               Moderately Reliable
             </div>
-
+          
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
               <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
                 Primary Risk
@@ -152,7 +152,17 @@ export function HeroSection() {
                 reliability.
               </p>
             </div>
-
+          
+            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
+                Better Prompt
+              </div>
+              <p className="mt-1 text-sm leading-6 text-slate-700">
+                Revise the answer with clearer assumptions, missing constraints,
+                and stronger reasoning.
+              </p>
+            </div>
+          
             <div className="mt-4 text-sm font-semibold text-indigo-600">
               Analyze reasoning →
             </div>
