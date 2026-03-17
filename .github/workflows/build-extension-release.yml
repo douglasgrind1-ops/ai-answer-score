@@ -15,7 +15,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Verify extension files exist
+      - name: Create extension zip
         run: |
-          test -f extension/manifest.json
-         
+          cd extension
+          zip -r ai-answer-score-extension.zip .
+
+      - name: Upload zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: extension/ai-answer-score-extension.zip
