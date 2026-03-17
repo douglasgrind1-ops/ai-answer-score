@@ -360,6 +360,7 @@ type LiveDemoPanelProps = {
   loading: boolean;
   error: string;
   onSubmit: (e: FormEvent) => void;
+  onRunSampleDemo: () => void;
 };
 
 export function LiveDemoPanel({
@@ -376,6 +377,7 @@ export function LiveDemoPanel({
   loading,
   error,
   onSubmit,
+  onRunSampleDemo, //
 }: LiveDemoPanelProps) {
   const sampleQuestion =
     "Does the ACT provide an objective measure of college readiness?";
@@ -448,7 +450,7 @@ export function LiveDemoPanel({
           
             <button
               type="button"
-              onClick={loadSample}
+              onClick={onRunSampleDemo}
               className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-300 transition hover:bg-indigo-500"
             >
               <span>Run sample demo</span>
