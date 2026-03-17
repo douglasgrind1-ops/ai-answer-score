@@ -1,0 +1,21 @@
+name: Build extension release zip
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-extension-zip:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Verify extension files exist
+        run: |
+          test -f extension/manifest.json
+         
