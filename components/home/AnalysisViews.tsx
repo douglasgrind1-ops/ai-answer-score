@@ -144,7 +144,7 @@ export function SingleAnswerView({
         />
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2">
+      <section className="grid gap-6 md:grid-cols-3">
         <WeightedListCard
           title="Weakest assumptions"
           items={result.stress_test.weakest_assumptions}
@@ -156,10 +156,6 @@ export function SingleAnswerView({
         <WeightedListCard
           title="Reasoning gaps"
           items={result.stress_test.reasoning_gaps}
-        />
-        <WeightedListCard
-          title="Failure scenarios"
-          items={result.stress_test.failure_scenarios}
         />
       </section>
 
