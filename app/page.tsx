@@ -161,6 +161,7 @@ function runSampleDemo() {
           loading={loading}
           error={error}
           onSubmit={handleSubmit}
+          onRunSampleDemo={runSampleDemo}
         />
 
         {result ? (
