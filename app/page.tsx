@@ -75,6 +75,24 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+function runSampleDemo() {
+  const q =
+    "Does the ACT provide an objective measure of college readiness?";
+  const a =
+    "Yes. The ACT provides an objective measure of college readiness because it uses a standardized test format to evaluate all students equally. Since every student takes the same exam under similar conditions, the results offer a fair and reliable indicator of whether a student is prepared for college-level work.";
+
+  setCompare(false);
+  setMode("blind_spots");
+  setQuestion(q);
+  setAnswer(a);
+  setAnswerB("");
+
+  setTimeout(() => {
+    const form = document.querySelector("#live-demo form") as HTMLFormElement | null;
+    form?.requestSubmit();
+  }, 50);
+}
+  
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
