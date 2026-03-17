@@ -30,7 +30,7 @@ export function HeaderNav() {
           <a href="#model-snapshot" className="hover:text-slate-900">
             Model snapshot
           </a>
-         <a href="/#live-demo">Try demo</a>
+         <a href="/#live-demo" className="hover:text-slate-900">
             Live demo
           </a>
           <a href="#install-extension" className="hover:text-slate-900">
