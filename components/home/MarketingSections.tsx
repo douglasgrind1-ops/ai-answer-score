@@ -449,10 +449,10 @@ export function LiveDemoPanel({
             <button
               type="button"
               onClick={loadSample}
-              className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:bg-indigo-500"
+              className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-300 transition hover:bg-indigo-500"
             >
               <span>Run sample demo</span>
-          
+            
               <span className="ml-2 transition-transform group-hover:translate-x-1">
                 →
               </span>
