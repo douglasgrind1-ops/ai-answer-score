@@ -447,7 +447,7 @@ export function LiveDemoPanel({
               onClick={loadSample}
               className={`inline-flex items-center justify-center rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition ${
                 usingSample
-                  ? "animate-pulse bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20"
+                  ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20"
                   : "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-sm hover:from-blue-500 hover:to-indigo-500"
               }`}
             >
