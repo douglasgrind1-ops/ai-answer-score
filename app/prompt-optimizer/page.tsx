@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { trackEvent } from "@/lib/analytics";
 
-export default function PromptOptimizerPage() {
+export default function PromptBuilderPage() {
+  const variant = "prompt_builder";
+
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 text-slate-900">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-900">
       <div className="mx-auto max-w-6xl px-6 py-8 md:px-8 md:py-10">
         <header className="sticky top-4 z-30 mb-10">
           <nav className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-sm backdrop-blur">
@@ -16,7 +19,7 @@ export default function PromptOptimizerPage() {
               />
               <div className="leading-tight">
                 <div className="text-sm font-semibold text-slate-900 md:text-base">
-                  AI Prompt Optimizer
+                  AI Prompt Builder
                 </div>
                 <div className="text-xs text-slate-500">
                   by AI Answer Score
@@ -41,9 +44,16 @@ export default function PromptOptimizerPage() {
 
             <a
               href="#live-demo"
+              onClick={() =>
+                trackEvent("cta_click", {
+                  variant,
+                  location: "nav",
+                  cta: "build_better_prompt",
+                })
+              }
               className="rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-blue-500"
             >
-              Improve an answer
+              Build a better prompt
             </a>
           </nav>
         </header>
@@ -51,31 +61,45 @@ export default function PromptOptimizerPage() {
         <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="space-y-6">
             <div className="inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
-              Fix weak AI answers in one click
+              Turn weak answers into reusable prompts
             </div>
 
             <div className="space-y-4">
               <h1 className="max-w-4xl text-5xl font-black tracking-tight text-slate-950 md:text-7xl">
-                Turn weak AI answers into stronger prompts instantly.
+                Build better prompts from weak AI answers instantly.
               </h1>
 
               <p className="max-w-2xl text-lg leading-8 text-slate-700 md:text-xl">
-                AI Prompt Optimizer finds what is missing in an AI answer and
-                gives you a stronger prompt you can reuse immediately inside
-                ChatGPT.
+                AI Prompt Builder takes a weak answer, identifies what is
+                missing, and gives you a stronger prompt you can paste back into
+                ChatGPT right away.
               </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
                 href="#live-demo"
+                onClick={() =>
+                  trackEvent("cta_click", {
+                    variant,
+                    location: "hero",
+                    cta: "build_better_prompt",
+                  })
+                }
                 className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
               >
-                Improve this answer
+                Build a better prompt
               </a>
 
               <a
                 href="#install"
+                onClick={() =>
+                  trackEvent("cta_click", {
+                    variant,
+                    location: "hero_secondary",
+                    cta: "add_to_chrome",
+                  })
+                }
                 className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
               >
                 Add to Chrome
@@ -84,16 +108,16 @@ export default function PromptOptimizerPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <FeatureCard
-                eyebrow="Find gaps"
-                text="Identifies what the answer missed, assumed, or glossed over."
+                eyebrow="Extract gaps"
+                text="Find what the answer missed, assumed, or overstated."
               />
               <FeatureCard
-                eyebrow="Generate prompt"
-                text="Builds a stronger follow-up prompt you can use right away."
+                eyebrow="Build prompt"
+                text="Turn weak reasoning into a stronger prompt automatically."
               />
               <FeatureCard
-                eyebrow="Improve output"
-                text="Helps you get a sharper, more useful answer on the next pass."
+                eyebrow="Reuse instantly"
+                text="Paste the improved prompt back into ChatGPT and get a better answer."
               />
             </div>
           </div>
@@ -102,7 +126,7 @@ export default function PromptOptimizerPage() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  Prompt Optimizer Preview
+                  Prompt Builder Preview
                 </div>
                 <div className="mt-1 text-sm font-semibold text-slate-600">
                   What users get instantly
@@ -116,7 +140,7 @@ export default function PromptOptimizerPage() {
 
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                Original answer
+                Weak AI answer
               </div>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 “Yes. The ACT provides an objective measure of college readiness
@@ -125,22 +149,23 @@ export default function PromptOptimizerPage() {
 
               <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
-                  What’s weak
+                  What’s missing
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-700">
-                  Missing limitations, unsupported fairness claim, and weak
-                  reasoning about what “objective” actually means.
+                  Limitations of standardized testing, unsupported fairness
+                  claims, and weak reasoning about what “objective” actually
+                  means.
                 </p>
               </div>
 
               <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
-                  Stronger follow-up prompt
+                  Built prompt
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-700">
-                  Revise the answer with clearer assumptions, limitations of the
-                  ACT, fairness concerns across student groups, and stronger
-                  evidence for any claim about college readiness.
+                  Revise the answer with clearer assumptions, evidence about ACT
+                  predictive validity, limitations of standardized testing, and
+                  fairness concerns across student groups.
                 </p>
               </div>
 
@@ -160,32 +185,31 @@ export default function PromptOptimizerPage() {
               How it works
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-              From weak answer to better prompt in seconds
+              Build a stronger prompt from any weak answer
             </h2>
             <p className="max-w-3xl text-lg leading-8 text-slate-600">
-              AI Prompt Optimizer is designed for one job: turn a shaky answer
-              into a better next prompt without making you do the analysis
-              yourself.
+              Instead of manually rewriting prompts, AI Prompt Builder turns weak
+              AI output into a better next-step instruction for you.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <StepCard
-              step="1. Detect"
-              title="Find what is weak"
-              description="Surface missing risks, weak assumptions, and reasoning gaps."
+              step="1. Inspect"
+              title="Spot what is weak"
+              description="Surface missing risks, unsupported claims, and weak assumptions."
               accent="bg-indigo-50 text-indigo-700"
             />
             <StepCard
-              step="2. Rewrite"
-              title="Generate a stronger prompt"
-              description="Turn the critique into a usable next-step prompt automatically."
+              step="2. Build"
+              title="Generate a better prompt"
+              description="Convert critique into a reusable prompt automatically."
               accent="bg-amber-50 text-amber-700"
             />
             <StepCard
-              step="3. Improve"
+              step="3. Reuse"
               title="Get a better answer"
-              description="Paste the prompt back into ChatGPT and get a stronger response."
+              description="Paste the prompt back into ChatGPT and improve the next response."
               accent="bg-emerald-50 text-emerald-700"
             />
           </div>
@@ -195,15 +219,15 @@ export default function PromptOptimizerPage() {
           <ExampleCard
             title="Weak assumption"
             original="The answer assumes the test measures all relevant readiness factors."
-            improved="Revise the answer by distinguishing academic test performance from broader college readiness factors like writing, persistence, and support systems."
+            improved="Revise the answer by separating academic test performance from broader college readiness factors like writing, persistence, and support systems."
           />
           <ExampleCard
             title="Missing risk"
-            original="The answer ignores potential bias across student populations."
-            improved="Revise the answer to address whether ACT scores predict college success consistently across different demographic and socioeconomic groups."
+            original="The answer ignores possible bias across different student groups."
+            improved="Revise the answer to address whether ACT scores predict college success consistently across demographic and socioeconomic groups."
           />
           <ExampleCard
-            title="Reasoning gap"
+            title="Overstated conclusion"
             original="The conclusion is stronger than the evidence provided."
             improved="Rewrite the answer so the conclusion matches the available evidence and clearly states what remains uncertain."
           />
@@ -219,16 +243,23 @@ export default function PromptOptimizerPage() {
                 Chrome extension
               </div>
               <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-                Improve answers directly inside ChatGPT
+                Build better prompts directly inside ChatGPT
               </h2>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Install the extension to spot weak answers and generate a
-                stronger follow-up prompt without leaving the conversation.
+                Install the extension to turn weak answers into stronger
+                reusable prompts without leaving the conversation.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <a
                   href="#"
+                  onClick={() =>
+                    trackEvent("cta_click", {
+                      variant,
+                      location: "install_section",
+                      cta: "add_to_chrome",
+                    })
+                  }
                   className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
                 >
                   Add to Chrome
@@ -250,7 +281,7 @@ export default function PromptOptimizerPage() {
 
               <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  Stronger follow-up prompt
+                  Built prompt
                 </div>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
                   Revise this answer with clearer assumptions, explicit
@@ -274,11 +305,11 @@ export default function PromptOptimizerPage() {
               Live demo
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-              Try the optimizer on a sample answer
+              Try the prompt builder on a sample answer
             </h2>
             <p className="max-w-3xl text-lg leading-8 text-slate-600">
               Start with a sample or use your own answer to see how the prompt
-              gets improved.
+              gets built.
             </p>
           </div>
 
@@ -288,7 +319,7 @@ export default function PromptOptimizerPage() {
               text="Does the ACT provide an objective measure of college readiness?"
             />
             <DemoCard
-              title="Sample output"
+              title="Built prompt"
               text="Revise the answer with clearer assumptions, limitations of standardized testing, and evidence about fairness and predictive validity across student groups."
             />
           </div>
@@ -296,6 +327,13 @@ export default function PromptOptimizerPage() {
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <a
               href="/#live-demo"
+              onClick={() =>
+                trackEvent("cta_click", {
+                  variant,
+                  location: "live_demo",
+                  cta: "try_live_demo",
+                })
+              }
               className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
             >
               Try the live demo
