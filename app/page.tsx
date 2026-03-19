@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, , useEffect, useState } from "react";
 import {
   HeaderNav,
   HeroSection,
@@ -75,6 +75,18 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  
+    if (window.location.hash) {
+      history.replaceState(null, "", window.location.pathname);
+    }
+  
+    window.scrollTo(0, 0);
+  }, []);
+  
 function runSampleDemo() {
   const q =
     "Does the ACT provide an objective measure of college readiness?";
