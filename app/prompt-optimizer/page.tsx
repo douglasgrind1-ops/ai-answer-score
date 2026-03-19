@@ -59,22 +59,45 @@ export default function PromptBuilderPage() {
         </header>
 
         <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="space-y-6">
-            <div className="inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
-              Turn weak answers into reusable prompts
-            </div>
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+  Weak answer
+</div>
 
-            <div className="space-y-4">
-              <h1 className="max-w-4xl text-5xl font-black tracking-tight text-slate-950 md:text-7xl">
-                Build better prompts from weak AI answers instantly.
-              </h1>
+<p className="mt-3 text-sm text-slate-700">
+  “Yes. The ACT provides an objective measure of college readiness…”
+</p>
 
-              <p className="max-w-2xl text-lg leading-8 text-slate-700 md:text-xl">
-                AI Prompt Builder takes a weak answer, identifies what is
-                missing, and gives you a stronger prompt you can paste back into
-                ChatGPT right away.
+          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+  Weak answer
+</div>
+
+<p className="mt-3 text-sm text-slate-700">
+  “Yes. The ACT provides an objective measure of college readiness…”
+</p>
+
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+              <div className="text-xs font-bold uppercase text-red-700">
+                Problem
+              </div>
+              <p className="text-sm">
+                Overconfident claim, missing limitations, weak reasoning.
               </p>
             </div>
+            
+            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
+              <div className="text-xs font-bold uppercase text-indigo-700">
+                Fixed prompt
+              </div>
+              <p className="text-sm">
+                Revise the answer with clearer assumptions, limitations of standardized testing,
+                and evidence about fairness across student groups.
+              </p>
+            </div>
+            
+            <div className="inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
+              Turn bad answers into better prompts
+            </div>
+            
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
