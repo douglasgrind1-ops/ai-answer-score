@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { trackEvent } from "@/lib/analytics";
 
-export default function PromptBuilderPage() {
-  const variant = "prompt_builder";
+export default function PromptOptimizerPage() {
+  const variant = "prompt_optimizer";
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-slate-900">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 text-slate-900">
       <div className="mx-auto max-w-6xl px-6 py-8 md:px-8 md:py-10">
         <header className="sticky top-4 z-30 mb-10">
           <nav className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/85 px-4 py-3 shadow-sm backdrop-blur">
@@ -19,7 +19,7 @@ export default function PromptBuilderPage() {
               />
               <div className="leading-tight">
                 <div className="text-sm font-semibold text-slate-900 md:text-base">
-                  AI Prompt Builder
+                  AI Prompt Optimizer
                 </div>
                 <div className="text-xs text-slate-500">
                   by AI Answer Score
@@ -48,56 +48,36 @@ export default function PromptBuilderPage() {
                 trackEvent("cta_click", {
                   variant,
                   location: "nav",
-                  cta: "build_better_prompt",
+                  cta: "fix_this_answer",
                 })
               }
               className="rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-blue-500"
             >
-              Build a better prompt
+              Fix this answer
             </a>
           </nav>
         </header>
 
         <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-  Weak answer
-</div>
-
-<p className="mt-3 text-sm text-slate-700">
-  “Yes. The ACT provides an objective measure of college readiness…”
-</p>
-
-          <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-  Weak answer
-</div>
-
-<p className="mt-3 text-sm text-slate-700">
-  “Yes. The ACT provides an objective measure of college readiness…”
-</p>
-
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
-              <div className="text-xs font-bold uppercase text-red-700">
-                Problem
-              </div>
-              <p className="text-sm">
-                Overconfident claim, missing limitations, weak reasoning.
-              </p>
-            </div>
-            
-            <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
-              <div className="text-xs font-bold uppercase text-indigo-700">
-                Fixed prompt
-              </div>
-              <p className="text-sm">
-                Revise the answer with clearer assumptions, limitations of standardized testing,
-                and evidence about fairness across student groups.
-              </p>
-            </div>
-            
+          <div className="space-y-6">
             <div className="inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
               Turn bad answers into better prompts
             </div>
-            
+
+            <div className="space-y-4">
+              <h1 className="max-w-4xl text-5xl font-black tracking-tight text-slate-950 md:text-7xl">
+                Fix weak AI answers instantly.
+              </h1>
+
+              <p className="max-w-2xl text-lg leading-8 text-slate-700 md:text-xl">
+                Paste any AI answer and get a stronger prompt you can reuse to
+                improve it. No guessing. No rewriting. Just better results.
+              </p>
+
+              <p className="text-sm text-slate-500">
+                Works instantly with ChatGPT responses.
+              </p>
+            </div>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <a
@@ -106,12 +86,12 @@ export default function PromptBuilderPage() {
                   trackEvent("cta_click", {
                     variant,
                     location: "hero",
-                    cta: "build_better_prompt",
+                    cta: "fix_this_answer",
                   })
                 }
                 className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
               >
-                Build a better prompt
+                Fix this answer
               </a>
 
               <a
@@ -131,25 +111,25 @@ export default function PromptBuilderPage() {
 
             <div className="grid gap-4 sm:grid-cols-3">
               <FeatureCard
-                eyebrow="Extract gaps"
-                text="Find what the answer missed, assumed, or overstated."
+                eyebrow="Find gaps"
+                text="Identifies what the answer missed, assumed, or overstated."
               />
               <FeatureCard
                 eyebrow="Build prompt"
-                text="Turn weak reasoning into a stronger prompt automatically."
+                text="Turns weak reasoning into a stronger next-step prompt automatically."
               />
               <FeatureCard
-                eyebrow="Reuse instantly"
-                text="Paste the improved prompt back into ChatGPT and get a better answer."
+                eyebrow="Improve output"
+                text="Helps you get a sharper, more useful answer on the next pass."
               />
             </div>
           </div>
 
-          <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60">
+          <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/60">
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  Prompt Builder Preview
+                  Prompt Optimizer Preview
                 </div>
                 <div className="mt-1 text-sm font-semibold text-slate-600">
                   What users get instantly
@@ -163,32 +143,31 @@ export default function PromptBuilderPage() {
 
             <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
               <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                Weak AI answer
+                Weak answer
               </div>
               <p className="mt-3 text-sm leading-7 text-slate-700">
                 “Yes. The ACT provides an objective measure of college readiness
                 because it evaluates all students equally.”
               </p>
 
-              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <div className="text-xs font-bold uppercase tracking-[0.14em] text-amber-700">
-                  What’s missing
+              <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-red-700">
+                  Problem
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-700">
-                  Limitations of standardized testing, unsupported fairness
-                  claims, and weak reasoning about what “objective” actually
-                  means.
+                  Overconfident claim, missing limitations, and weak reasoning
+                  about what “objective” actually means.
                 </p>
               </div>
 
               <div className="mt-4 rounded-2xl border border-indigo-200 bg-indigo-50 px-4 py-3">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-700">
-                  Built prompt
+                  Stronger follow-up prompt
                 </div>
                 <p className="mt-1 text-sm leading-6 text-slate-700">
-                  Revise the answer with clearer assumptions, evidence about ACT
-                  predictive validity, limitations of standardized testing, and
-                  fairness concerns across student groups.
+                  Revise the answer with clearer assumptions, limitations of
+                  standardized testing, and evidence about fairness across
+                  student groups.
                 </p>
               </div>
 
@@ -196,7 +175,7 @@ export default function PromptBuilderPage() {
                 Copy prompt →
               </div>
             </div>
-          </section>
+          </div>
         </section>
 
         <section
@@ -205,34 +184,35 @@ export default function PromptBuilderPage() {
         >
           <div className="mb-8 space-y-3">
             <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-              How it works
+              How it fixes answers
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-              Build a stronger prompt from any weak answer
+              From weak answer to stronger prompt in seconds
             </h2>
             <p className="max-w-3xl text-lg leading-8 text-slate-600">
-              Instead of manually rewriting prompts, AI Prompt Builder turns weak
-              AI output into a better next-step instruction for you.
+              AI Prompt Optimizer is built for one job: take a weak answer and
+              turn it into a better next-step prompt without making you do the
+              analysis yourself.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
             <StepCard
-              step="1. Inspect"
-              title="Spot what is weak"
-              description="Surface missing risks, unsupported claims, and weak assumptions."
+              step="1. Find what’s wrong"
+              title="Spot weak reasoning"
+              description="Surface missing risks, weak assumptions, and unsupported claims."
               accent="bg-indigo-50 text-indigo-700"
             />
             <StepCard
-              step="2. Build"
-              title="Generate a better prompt"
-              description="Convert critique into a reusable prompt automatically."
+              step="2. Generate a better prompt"
+              title="Rewrite the next step"
+              description="Convert critique into a usable prompt automatically."
               accent="bg-amber-50 text-amber-700"
             />
             <StepCard
-              step="3. Reuse"
-              title="Get a better answer"
-              description="Paste the prompt back into ChatGPT and improve the next response."
+              step="3. Get a stronger answer"
+              title="Improve the output"
+              description="Paste the prompt back into ChatGPT and get a better result."
               accent="bg-emerald-50 text-emerald-700"
             />
           </div>
@@ -266,11 +246,11 @@ export default function PromptBuilderPage() {
                 Chrome extension
               </div>
               <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-                Build better prompts directly inside ChatGPT
+                Fix answers directly inside ChatGPT
               </h2>
               <p className="max-w-2xl text-lg leading-8 text-slate-600">
-                Install the extension to turn weak answers into stronger
-                reusable prompts without leaving the conversation.
+                Install the extension to spot weak answers and generate a
+                stronger prompt without leaving the conversation.
               </p>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -304,7 +284,7 @@ export default function PromptBuilderPage() {
 
               <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  Built prompt
+                  Stronger follow-up prompt
                 </div>
                 <p className="mt-3 text-sm leading-7 text-slate-700">
                   Revise this answer with clearer assumptions, explicit
@@ -325,14 +305,14 @@ export default function PromptBuilderPage() {
         >
           <div className="mb-8 space-y-3">
             <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-              Live demo
+              Fix an answer now
             </div>
             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-              Try the prompt builder on a sample answer
+              Try the optimizer on a sample answer
             </h2>
             <p className="max-w-3xl text-lg leading-8 text-slate-600">
               Start with a sample or use your own answer to see how the prompt
-              gets built.
+              gets improved.
             </p>
           </div>
 
@@ -342,7 +322,7 @@ export default function PromptBuilderPage() {
               text="Does the ACT provide an objective measure of college readiness?"
             />
             <DemoCard
-              title="Built prompt"
+              title="Fixed prompt"
               text="Revise the answer with clearer assumptions, limitations of standardized testing, and evidence about fairness and predictive validity across student groups."
             />
           </div>
