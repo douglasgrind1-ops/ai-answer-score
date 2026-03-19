@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { trackEvent } from "@/lib/analytics";
+import { trackEvent } from "../../lib/analytics";
 
 export default function PromptOptimizerPage() {
   const variant = "prompt_optimizer";
