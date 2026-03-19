@@ -61,17 +61,16 @@ export default function PromptOptimizerPage() {
         <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="space-y-6">
             <div className="inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-sm font-medium text-indigo-700 shadow-sm">
-              Turn bad answers into better prompts
+              Turn weak answers into better prompts
             </div>
 
             <div className="space-y-4">
               <h1 className="max-w-4xl text-5xl font-black tracking-tight text-slate-950 md:text-7xl">
-                Fix weak AI answers instantly.
+                Fix weak AI answers with a stronger next prompt.
               </h1>
 
               <p className="max-w-2xl text-lg leading-8 text-slate-700 md:text-xl">
-                Paste any AI answer and get a stronger prompt you can reuse to
-                improve it. No guessing. No rewriting. Just better results.
+                AI Prompt Optimizer finds what is missing and gives you a better prompt you can reuse immediately.
               </p>
 
               <p className="text-sm text-slate-500">
@@ -91,7 +90,7 @@ export default function PromptOptimizerPage() {
                 }
                 className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
               >
-                Fix this answer
+                Try the demo
               </a>
 
               <a
