@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Answer Score - Trust AI Answers",
   "version": "1.0.1",
-  "description": "Score AI answers, detect risks, and generate stronger follow-up prompts instantly.",
+  "description": "Fix weak AI answers instantly. Detect risks, improve reasoning, and generate stronger prompts in one click."
   "host_permissions": [
     "https://chat.openai.com/*",
     "https://chatgpt.com/*",
