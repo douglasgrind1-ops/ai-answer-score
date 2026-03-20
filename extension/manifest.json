@@ -3,7 +3,7 @@
   "name": "AI Answer Score - Trust AI Answers",
   "version": "1.0.0",
   "description": "Score AI answers, detect risks, and generate stronger follow-up prompts instantly.",
-  "permissions": ["storage"],
+  "permissions": [ ],
   "host_permissions": [
     "https://chat.openai.com/*",
     "https://chatgpt.com/*",
