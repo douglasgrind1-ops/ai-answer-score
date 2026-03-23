@@ -396,14 +396,6 @@ export function LiveDemoPanel({
     answer.trim().length > 0 ||
     answerB.trim().length > 0;
 
-  function loadSample() {
-    setCompare(false);
-    setMode("blind_spots");
-    setQuestion(sampleQuestion);
-    setAnswer(sampleAnswer);
-    setAnswerB("");
-  }
-
   function clearSample() {
     setQuestion("");
     setAnswer("");
@@ -451,13 +443,16 @@ export function LiveDemoPanel({
             <button
               type="button"
               onClick={onRunSampleDemo}
-              className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-300 transition hover:bg-indigo-500"
+              disabled={loading}
+              className="group relative inline-flex items-center justify-center rounded-2xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-300 transition hover:bg-indigo-500 disabled:opacity-60"
             >
-              <span>Run sample demo</span>
+              <span>{loading ? "Analyzing..." : "Run demo"}</span>
             
-              <span className="ml-2 transition-transform group-hover:translate-x-1">
-                →
-              </span>
+              {!loading && (
+                <span className="ml-2 transition-transform group-hover:translate-x-1">
+                  →
+                </span>
+              )}
             </button>
           
             <p className="text-xs text-slate-500">
