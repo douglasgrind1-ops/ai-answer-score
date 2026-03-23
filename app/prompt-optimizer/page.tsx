@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { trackEvent } from "../../lib/analytics";
 
-const CHROME_WEB_STORE_URL =
-  "https://chromewebstore.google.com/detail/dofnploiomlfbjhpbjnhoebhmgmbpjkn";
+<a
+  href="https://chromewebstore.google.com/detail/dofnploiomlfbjhpbjnhoebhmgmbpjkn"
+  target="_blank"
+  rel="noreferrer"
+>
+  Add to Chrome
+</a>
 
 export default function PromptOptimizerPage() {
   const variant = "prompt_optimizer";
