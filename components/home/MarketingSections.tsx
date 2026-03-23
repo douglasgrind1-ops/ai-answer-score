@@ -3,7 +3,8 @@
 import { FormEvent } from "react";
 import type { Mode } from "./types";
 
-const CHROME_WEB_STORE_URL = "YOUR_CHROME_WEB_STORE_URL";
+const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/dofnploionlfbjhpbjnhoebhmgmbpjkn";
 
 export function HeaderNav() {
   return (
