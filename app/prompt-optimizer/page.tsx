@@ -292,7 +292,6 @@ export default function PromptOptimizerPage() {
                 </div>
               </div>
             </div>
-          </div>
         </section>
 
         <section
