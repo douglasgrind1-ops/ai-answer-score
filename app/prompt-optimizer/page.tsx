@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { trackEvent } from "../../lib/analytics";
 
+const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/dofnploionlfbjhpbjnhoebhmgmbpjkn";
+
 export default function PromptOptimizerPage() {
   const variant = "prompt_optimizer";
 
@@ -254,7 +257,10 @@ export default function PromptOptimizerPage() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="#"
+                  <a
+                    href={CHROME_WEB_STORE_URL}
+                    target="_blank"
+                    rel="noreferrer"
                   onClick={() =>
                     trackEvent("cta_click", {
                       variant,
