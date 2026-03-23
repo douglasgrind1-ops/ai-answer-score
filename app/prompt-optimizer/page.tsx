@@ -4,7 +4,7 @@ import Link from "next/link";
 import { trackEvent } from "../../lib/analytics";
 
 const CHROME_WEB_STORE_URL =
-  "https://chromewebstore.google.com/detail/dofnploionlfbjhpbjnhoebhmgmbpjkn";
+  "https://chromewebstore.google.com/detail/dofnploiomlfbjhpbjnhoebhmgmbpjkn";
 
 export default function PromptOptimizerPage() {
   const variant = "prompt_optimizer";
