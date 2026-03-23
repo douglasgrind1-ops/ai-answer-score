@@ -255,24 +255,16 @@ export default function PromptOptimizerPage() {
                 stronger prompt without leaving the conversation.
               </p>
 
-              <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
-                  <a
-                    href={CHROME_WEB_STORE_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                  onClick={() =>
-                    trackEvent("cta_click", {
-                      variant,
-                      location: "install_section",
-                      cta: "add_to_chrome",
-                    })
-                  }
+                  href={CHROME_WEB_STORE_URL}
+                  target="_blank"
+                  rel="noreferrer"
                   className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-blue-500"
                 >
                   Add to Chrome
                 </a>
-
+              
                 <Link
                   href="/privacy"
                   className="inline-flex items-center justify-center rounded-2xl border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
@@ -280,7 +272,6 @@ export default function PromptOptimizerPage() {
                   Privacy Policy
                 </Link>
               </div>
-            </div>
 
             <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-sm">
               <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
