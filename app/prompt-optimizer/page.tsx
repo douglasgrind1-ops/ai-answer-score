@@ -254,7 +254,7 @@ export default function PromptOptimizerPage() {
                 Install the extension to spot weak answers and generate a
                 stronger prompt without leaving the conversation.
               </p>
-
+              
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <a
                   href={CHROME_WEB_STORE_URL}
@@ -272,37 +272,39 @@ export default function PromptOptimizerPage() {
                   Privacy Policy
                 </Link>
               </div>
-
-            <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                Extension preview
               </div>
-
-              <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              
+              <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6 shadow-sm">
                 <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
-                  Stronger follow-up prompt
+                  Extension preview
                 </div>
-                <p className="mt-3 text-sm leading-7 text-slate-700">
-                  Revise this answer with clearer assumptions, explicit
-                  limitations, missing risks, and evidence that matches the
-                  strength of the conclusion.
-                </p>
-                <div className="mt-4 text-sm font-semibold text-indigo-600">
-                  Copy prompt →
+              
+                <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="text-xs font-bold uppercase tracking-[0.14em] text-indigo-600">
+                    Stronger follow-up prompt
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-slate-700">
+                    Revise this answer with clearer assumptions, explicit
+                    limitations, missing risks, and evidence that matches the
+                    strength of the conclusion.
+                  </p>
+                  <div className="mt-4 text-sm font-semibold text-indigo-600">
+                    Copy prompt →
+                  </div>
                 </div>
               </div>
-            </div>
-        </section>
-
-        <section
-          id="live-demo"
-          className="mt-16 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
-        >
-          <div className="mb-8 space-y-3">
-            <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
-              Fix an answer now
-            </div>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              </div>
+              </section>
+              
+              <section
+                id="live-demo"
+                className="mt-16 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm"
+              >
+                <div className="mb-8 space-y-3">
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-indigo-500">
+                    Fix an answer now
+    </div>
+    <h2 className="text-3xl font-bold tracking-tight text-slate-900">
               Try the optimizer on a sample answer
             </h2>
             <p className="max-w-3xl text-lg leading-8 text-slate-600">
